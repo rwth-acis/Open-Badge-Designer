@@ -1,4 +1,5 @@
 // on start-up prepare necessary UI elements
+
 $(document).ready(function(){
     constructUI();
 });
@@ -39,16 +40,18 @@ function constructUI(){
     right.appendChild(authorizetextlocation);
     right.appendChild(authorizefieldlocation);
 
-    //
+    // create a field to enter the URL of the Backend
     var backendtext = document.createTextNode("Step 1 (necessary): connect to a Backend instance");
     backendtextlocation.append(backendtext);
     var backendfield = document.createElement("INPUT");
     setAttributes(backendfield,
             "type", "text",
-            "placeholder", "http://localhost:9000");
+            "placeholder", "http://localhost:9000",
+            "id", "backendfield");
     backendfieldlocation.appendChild(backendfield);
     var backendbutton = document.createElement("BUTTON");
     backendbutton.appendChild(document.createTextNode("Test Connection"));
+    backendbutton.onclick = checkConnection;
     backendbuttonlocation.appendChild(backendbutton);
 
     // create a field to enter the URL of LRS
@@ -81,6 +84,23 @@ function appendChildren(elem /* children can be passed here */){
     for (var i=1; i < arguments.length; i+=1){
         elem.appendChild(arguments[i]);
     }
+}
+
+function checkConnection(){
+    var backend = document.getElementById("backendfield").value;
+    console.log("backend:" + backend);
+    if(backend == ""){
+        backend = document.getElementById("backendfield").placeholder;
+    }
+    $.ajax({
+        url: backend+"/checkconnection"
+    }).then(function(data, status, jqxhr) {
+	    console.log("jqxhr: "+jqxhr);
+	    console.log("data: "+data);
+	    alert(data);
+    }).fail(function(xhr, status, error){
+        alert("Error: please check if a backend instance is running at the specified location.");
+    });
 }
 
 /*

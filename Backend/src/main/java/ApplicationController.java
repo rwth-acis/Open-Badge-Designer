@@ -13,10 +13,10 @@ import okhttp3.OkHttpClient;
 public class ApplicationController {
 
     @CrossOrigin()
-    @GetMapping("/replytest")
-    public String replytest(@RequestParam(required=false, defaultValue="World") String name) {
-        System.out.println("Replying.");
-        return "Hello "+name+"!";
+    @GetMapping("/checkconnection")
+    public String checkConnection(@RequestParam(required=false, defaultValue="Connection confirmed!") String result) {
+        System.out.println("External Component has made a connection check.");
+        return result;
     }
 
     @CrossOrigin()
