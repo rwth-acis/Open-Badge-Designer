@@ -40,7 +40,8 @@ function constructUI(){
     
     // assign paragraphs to divisions
     appendChildren(left, backendtextlocation, backendfieldlocation, backendbuttonlocation);
-    appendChildren(right, urltextlocation, urlfieldlocation, authorizetextlocation, authorizefieldlocation, xapibuttonlocation);
+    appendChildren(right, urltextlocation, urlfieldlocation, authorizetextlocation, authorizefieldlocation, 
+            xapibuttonlocation, declarationstextlocation, declarationsselectlocation);
 
     // create elements for entering the URL of the Backend
     var backendtext = document.createTextNode("Step 1 (necessary): connect to a Backend instance");
@@ -76,6 +77,27 @@ function constructUI(){
     xapibutton.appendChild(document.createTextNode("Test Connection"));
     xapibutton.onclick = checkXAPIConnection;
     
+    // add a section to make declarations for how the xAPI data should be interpreted (Analytics)
+    declarationstext = document.createTextNode("To visualize xAPI data and gain recommendations, please fill in the following information:");
+    declarationsselect1 = document.createElement("select");
+        declarationsoption1_1 = document.createElement("option");
+            declarationsoption1_1.appendChild(document.createTextNode("Minimise"));
+            declarationsoption1_1.setAttribute("value", "min");
+            declarationsselect1.appendChild(declarationsoption1_1);
+        declarationsoption1_2 = document.createElement("option");
+            declarationsoption1_2.appendChild(document.createTextNode("Maximise"));
+            declarationsoption1_2.setAttribute("value", "max");
+            declarationsselect1.appendChild(declarationsoption1_2);
+    declarationsselect2 = document.createElement("select");
+        declarationsoption2_1 = document.createElement("option");
+            declarationsoption2_1.appendChild(document.createTextNode("Value"));
+            declarationsoption2_1.setAttribute("value", "val");
+            declarationsselect2.appendChild(declarationsoption2_1);
+        declarationsoption2_2 = document.createElement("option");
+            declarationsoption2_2.appendChild(document.createTextNode("Occurrence"));
+            declarationsoption2_2.setAttribute("value", "occur");
+            declarationsselect2.appendChild(declarationsoption2_2);
+    
     // add elements to their respective paragraphs / divisions
     backendtextlocation.append(backendtext);
     backendfieldlocation.appendChild(backendfield);
@@ -85,6 +107,8 @@ function constructUI(){
     authorizefieldlocation.appendChild(authorizefield);
     authorizetextlocation.appendChild(authorizetext);
     xapibuttonlocation.appendChild(xapibutton);
+    declarationstextlocation.appendChild(declarationstext);
+    appendChildren(declarationsselectlocation, declarationsselect1, declarationsselect2);
 }
 
 // function from stack overflow (license needed?)
