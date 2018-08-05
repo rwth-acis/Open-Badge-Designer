@@ -5,6 +5,12 @@ $(document).ready(function(){
 });
 
 
+/*
+    The UI could alternatively be made directly as part of HTML with CSS styling.
+    The constructUI() function is simply there to make it easier to add this frontend
+    to any existing page without major changes. All that's needed is a div tag with
+    the 'frontendUI' ID as seen in the index.html used to launch this during development.
+*/
 function constructUI(){
     // check location within HTML page to start building elements
     var location = document.getElementById("frontendUI");
@@ -14,42 +20,64 @@ function constructUI(){
     var right = document.createElement("div");
     location.appendChild(left);
     location.appendChild(right);
+    var backend = document.createElement("div");
+    var xapi = document.createElement("div");
+    var declarations = document.createElement("div");
+    var analytics = document.createElement("div");
+    var recommendations = document.createElement("div");
+    var badgesurvey = document.createElement("div");
     
     // set style for UI (CSS)
     // this allows to split the screen into a left and right section
     left.style.backgroundColor = 'papayawhip';
     left.style.width = '50%';
     left.style.left = 0;
-    left.style.position = 'fixed';
+    left.style.position = 'absolute';
     right.style.backgroundColor = 'wheat';
     right.style.width = '50%';
     right.style.right = 0;
-    right.style.position = 'fixed';
-
+    right.style.position = 'absolute';
+    backend.style.backgroundColor = 'lightcoral';
+    xapi.style.backgroundColor = 'lightsalmon';
+    declarations.style.backgroundColor = 'lightpink';
+    analytics.style.backgroundColor = 'lightgreen';
+    recommendations.style.backgroundColor = 'lightsteelblue';
+    badgesurvey.style.backgroundColor = 'lightyellow'
+    
     // prepare paragraphs
     var backendtextlocation = document.createElement("p");
     var backendfieldlocation = document.createElement("p");
     var backendbuttonlocation = document.createElement("p");
+        backendbuttonlocation.style.textAlign = 'right';
     var urltextlocation = document.createElement("p");
     var urlfieldlocation = document.createElement("p");
     var authorizetextlocation = document.createElement("p");
     var authorizefieldlocation = document.createElement("p");
     var xapibuttonlocation = document.createElement("p");
+        xapibuttonlocation.style.textAlign = 'right';
     var declarationstextlocation = document.createElement("p");
     var declarationsselectlocation = document.createElement("p");
+    var declarationsbuttonlocation = document.createElement("p");
+        declarationsbuttonlocation.style.textAlign = 'right';
+    var analyticstextlocation = document.createElement("p");
+    var analyticscanvaslocation = document.createElement("p");
+    
     
     // assign paragraphs to divisions
-    appendChildren(left, backendtextlocation, backendfieldlocation, backendbuttonlocation);
-    appendChildren(right, urltextlocation, urlfieldlocation, authorizetextlocation, authorizefieldlocation, 
-            xapibuttonlocation, declarationstextlocation, declarationsselectlocation);
+    appendChildren(left, backend, xapi, declarations, badgesurvey);
+    appendChildren(right, analytics, recommendations);
+    appendChildren(backend, backendtextlocation, backendfieldlocation, backendbuttonlocation);
+    appendChildren(xapi, urltextlocation, urlfieldlocation, authorizetextlocation, authorizefieldlocation, xapibuttonlocation);
+    appendChildren(declarations, declarationstextlocation, declarationsselectlocation, declarationsbuttonlocation);
+    appendChildren(analytics, analyticstextlocation, analyticscanvaslocation);
 
     // create elements for entering the URL of the Backend
     var backendtext = document.createTextNode("Step 1 (necessary): connect to a Backend instance");
     var backendfield = document.createElement("INPUT");
     setAttributes(backendfield,
-            "type", "text",
-            "placeholder", "http://localhost:9000",
-            "id", "backendfield");
+            ["type", "text"],
+            ["placeholder", "http://localhost:9000"],
+            ["id", "backendfield"]);
     
     // add a button to call checkConnection on click
     var backendbutton = document.createElement("BUTTON");
@@ -59,17 +87,17 @@ function constructUI(){
     // create elements for entering the URL of LRS
     var urlfield = document.createElement("INPUT");
     setAttributes(urlfield,
-            "type", "text",
-            "placeholder", "http://localhost/data/xAPI",
-            "id", "urlfield");
+            ["type", "text"],
+            ["placeholder", "http://localhost/data/xAPI"],
+            ["id", "urlfield"]);
     var urltext = document.createTextNode("Add URL of the statements section of your LRS here: ");
     
     // create elements for entering authorization for LRS
     var authorizefield = document.createElement("INPUT");
     setAttributes(authorizefield,
-            "type", "text",
-            "placeholder", "Basic MTZlODUyNzllYTQ5YzA5YTkzNGE2N2RhOWQzMjQ5M2Y1YTI1OTc5MjpjYWM3YTExYTJhY2E0N2Y2YjMxMDI4YjhkNjA3MTg4MjM2NTk0Y2Yy",
-            "id", "authfield");
+            ["type", "text"],
+            ["placeholder", "Basic MTZlODUyNzllYTQ5YzA5YTkzNGE2N2RhOWQzMjQ5M2Y1YTI1OTc5MjpjYWM3YTExYTJhY2E0N2Y2YjMxMDI4YjhkNjA3MTg4MjM2NTk0Y2Yy"],
+            ["id", "authfield"]);
     var authorizetext = document.createTextNode("Add HTTP authorization for the LRS");
     
     // add a button to call checkXAPIConnection on click
@@ -78,25 +106,43 @@ function constructUI(){
     xapibutton.onclick = checkXAPIConnection;
     
     // add a section to make declarations for how the xAPI data should be interpreted (Analytics)
-    declarationstext = document.createTextNode("To visualize xAPI data and gain recommendations, please fill in the following information:");
-    declarationsselect1 = document.createElement("select");
-        declarationsoption1_1 = document.createElement("option");
+    var declarationstext = document.createTextNode("To visualize xAPI data and gain recommendations, please fill in the following information:");
+    var declarationsselect1 = document.createElement("select");
+        var declarationsoption1_1 = document.createElement("option");
             declarationsoption1_1.appendChild(document.createTextNode("Minimise"));
             declarationsoption1_1.setAttribute("value", "min");
             declarationsselect1.appendChild(declarationsoption1_1);
-        declarationsoption1_2 = document.createElement("option");
+        var declarationsoption1_2 = document.createElement("option");
             declarationsoption1_2.appendChild(document.createTextNode("Maximise"));
             declarationsoption1_2.setAttribute("value", "max");
             declarationsselect1.appendChild(declarationsoption1_2);
-    declarationsselect2 = document.createElement("select");
-        declarationsoption2_1 = document.createElement("option");
+    var declarationsselect2 = document.createElement("select");
+        var declarationsoption2_1 = document.createElement("option");
             declarationsoption2_1.appendChild(document.createTextNode("Value"));
             declarationsoption2_1.setAttribute("value", "val");
             declarationsselect2.appendChild(declarationsoption2_1);
-        declarationsoption2_2 = document.createElement("option");
+        var declarationsoption2_2 = document.createElement("option");
             declarationsoption2_2.appendChild(document.createTextNode("Occurrence"));
             declarationsoption2_2.setAttribute("value", "occur");
             declarationsselect2.appendChild(declarationsoption2_2);
+    var declarationsvaluefield = document.createElement("INPUT");
+    setAttributes(declarationsvaluefield,
+            ["type", "text"],
+            ["placeholder", "timestamp"],
+            ["id", "declarationsvaluefield"]);
+    var declarationsvaluetext = document.createTextNode("(the xAPI key to process)");
+    
+    // add a button to call a function to analyse the LRS on given declarations (TODO:: implement)
+    var declarationsbutton = document.createElement("BUTTON");
+    declarationsbutton.appendChild(document.createTextNode("Analyse"));
+    declarationsbutton.onclick = checkXAPIConnection;
+    
+    // add a section to hold a badge design survey
+    
+    // add a section to display analytics
+    var analyticstext = document.createTextNode("Analytics go here. Enter declarations and hit the Analyse button to get results.");
+    var analyticscanvas = document.createElement("canvas");
+    // add a section to display badge recommendations
     
     // add elements to their respective paragraphs / divisions
     backendtextlocation.append(backendtext);
@@ -108,21 +154,23 @@ function constructUI(){
     authorizetextlocation.appendChild(authorizetext);
     xapibuttonlocation.appendChild(xapibutton);
     declarationstextlocation.appendChild(declarationstext);
-    appendChildren(declarationsselectlocation, declarationsselect1, declarationsselect2);
-}
-
-// function from stack overflow (license needed?)
-// apply several attribute, value pairs at once
-function setAttributes(elem /*attribute, value pairs can be passed here*/){
-    for (var i = 1; i < arguments.length; i+=2){
-        elem.setAttribute(arguments[i], arguments[i+1]);
-    }
+    appendChildren(declarationsselectlocation, declarationsselect1, declarationsselect2, declarationsvaluefield, declarationsvaluetext);
+    declarationsbuttonlocation.appendChild(declarationsbutton);
+    analyticstextlocation.appendChild(analyticstext);
+    analyticscanvaslocation.appendChild(analyticscanvas);
 }
 
 // append several children at once
-function appendChildren(elem /* children can be passed here */){
-    for (var i=1; i < arguments.length; i+=1){
+function appendChildren(elem /*children can be passed here */){
+    for (var i=1; i<arguments.length; i+=1){
         elem.appendChild(arguments[i]);
+    }
+}
+
+// apply several [attribute, value] pairs at once
+function setAttributes(elem /*[attribute, value] pairs can be passed here*/){
+    for (var i=1; i<arguments.length; i+=1){
+        elem.setAttribute(arguments[i][0], arguments[i][1]);
     }
 }
 
