@@ -16,16 +16,16 @@ function constructUI(){
     var location = document.getElementById("frontendUI");
     
     // prepare divisions
-    var left = document.createElement("div");
-    var right = document.createElement("div");
+    var left = document.createElement("DIV");
+    var right = document.createElement("DIV");
     location.appendChild(left);
     location.appendChild(right);
-    var backend = document.createElement("div");
-    var xapi = document.createElement("div");
-    var declarations = document.createElement("div");
-    var analytics = document.createElement("div");
-    var recommendations = document.createElement("div");
-    var badgesurvey = document.createElement("div");
+    var backend = document.createElement("DIV");
+    var xapi = document.createElement("DIV");
+    var declarations = document.createElement("DIV");
+    var analytics = document.createElement("DIV");
+    var recommendations = document.createElement("DIV");
+    var badgesurvey = document.createElement("DIV");
     
     // set style for UI (CSS)
     // this allows to split the screen into a left and right section
@@ -57,6 +57,8 @@ function constructUI(){
         xapibuttonlocation.style.textAlign = 'right';
     var declarationstextlocation = document.createElement("p");
     var declarationsselectlocation = document.createElement("p");
+    var declarationsConstraintsTextLocation = document.createElement("p");
+    var declarationsConstraintsFieldLocation = document.createElement("p");
     var declarationsbuttonlocation = document.createElement("p");
         declarationsbuttonlocation.style.textAlign = 'right';
     var analyticstextlocation = document.createElement("p");
@@ -68,7 +70,7 @@ function constructUI(){
     appendChildren(right, analytics, recommendations);
     appendChildren(backend, backendtextlocation, backendfieldlocation, backendbuttonlocation);
     appendChildren(xapi, urltextlocation, urlfieldlocation, authorizetextlocation, authorizefieldlocation, xapibuttonlocation);
-    appendChildren(declarations, declarationstextlocation, declarationsselectlocation, declarationsbuttonlocation);
+    appendChildren(declarations, declarationstextlocation, declarationsselectlocation, declarationsConstraintsTextLocation, declarationsConstraintsFieldLocation, declarationsbuttonlocation);
     appendChildren(analytics, analyticstextlocation, analyticscanvaslocation);
 
     // create elements for entering the URL of the Backend
@@ -107,21 +109,23 @@ function constructUI(){
     
     // add a section to make declarations for how the xAPI data should be interpreted (Analytics)
     var declarationstext = document.createTextNode("To visualize xAPI data and gain recommendations, please fill in the following information:");
-    var declarationsselect1 = document.createElement("select");
-        var declarationsoption1_1 = document.createElement("option");
+    var declarationsselect1 = document.createElement("SELECT");
+        declarationsselect1.setAttribute("id", "decselect1");
+        var declarationsoption1_1 = document.createElement("OPTION");
             declarationsoption1_1.appendChild(document.createTextNode("Minimise"));
             declarationsoption1_1.setAttribute("value", "min");
             declarationsselect1.appendChild(declarationsoption1_1);
-        var declarationsoption1_2 = document.createElement("option");
+        var declarationsoption1_2 = document.createElement("OPTION");
             declarationsoption1_2.appendChild(document.createTextNode("Maximise"));
             declarationsoption1_2.setAttribute("value", "max");
             declarationsselect1.appendChild(declarationsoption1_2);
     var declarationsselect2 = document.createElement("select");
-        var declarationsoption2_1 = document.createElement("option");
+        declarationsselect2.setAttribute("id", "decselect2");
+        var declarationsoption2_1 = document.createElement("OPTION");
             declarationsoption2_1.appendChild(document.createTextNode("Value"));
             declarationsoption2_1.setAttribute("value", "val");
             declarationsselect2.appendChild(declarationsoption2_1);
-        var declarationsoption2_2 = document.createElement("option");
+        var declarationsoption2_2 = document.createElement("OPTION");
             declarationsoption2_2.appendChild(document.createTextNode("Occurrence"));
             declarationsoption2_2.setAttribute("value", "occur");
             declarationsselect2.appendChild(declarationsoption2_2);
@@ -131,17 +135,24 @@ function constructUI(){
             ["placeholder", "timestamp"],
             ["id", "declarationsvaluefield"]);
     var declarationsvaluetext = document.createTextNode("(the xAPI key to process)");
+    var declarationsConstraintsText = document.createTextNode("The following allows to set constraints in comma-separated key:value pairs (timestamps are in ISO 8601 format)");
+    var declarationsConstraintsField = document.createElement("TEXTAREA");
+    setAttributes(declarationsConstraintsField,
+            ["rows","5"],
+            ["cols","60"],
+            ["placeholder", "since : 2001-01-01T00:00:00Z,\nuntil : 2018-01-01T00:00:00Z,\nagent:{\"mbox\":\"mailto : maxmustermann@example.org\"},\nverb : http://www.example.org/verb,\nactivity : http://example.org/activity"],
+            ["id", "declarationsconstraintsfield"]);
     
     // add a button to call a function to analyse the LRS on given declarations (TODO:: implement)
     var declarationsbutton = document.createElement("BUTTON");
     declarationsbutton.appendChild(document.createTextNode("Analyse"));
-    declarationsbutton.onclick = checkXAPIConnection;
+    declarationsbutton.onclick = analyseXAPI;
     
     // add a section to hold a badge design survey
     
     // add a section to display analytics
     var analyticstext = document.createTextNode("Analytics go here. Enter declarations and hit the Analyse button to get results.");
-    var analyticscanvas = document.createElement("canvas");
+    var analyticscanvas = document.createElement("CANVAS");
     // add a section to display badge recommendations
     
     // add elements to their respective paragraphs / divisions
@@ -155,6 +166,8 @@ function constructUI(){
     xapibuttonlocation.appendChild(xapibutton);
     declarationstextlocation.appendChild(declarationstext);
     appendChildren(declarationsselectlocation, declarationsselect1, declarationsselect2, declarationsvaluefield, declarationsvaluetext);
+    declarationsConstraintsTextLocation.appendChild(declarationsConstraintsText);
+    declarationsConstraintsFieldLocation.appendChild(declarationsConstraintsField);
     declarationsbuttonlocation.appendChild(declarationsbutton);
     analyticstextlocation.appendChild(analyticstext);
     analyticscanvaslocation.appendChild(analyticscanvas);
@@ -211,5 +224,23 @@ function checkXAPIConnection(){
     }).fail(function(xhr, status, error){
         alert("Error: please check if a backend instance is running at the specified location.");
     });
+}
+
+function analyseXAPI(){
+    var select1 = document.getElementById("decselect1");
+    var select2 = document.getElementById("decselect2");
+    
+    var keyfield = document.getElementById("declarationsvaluefield");
+    var constraintsfield = document.getElementById("declarationsconstraintsfield");
+    
+    var option1 = select1.options[select1.selectedIndex].value;
+    var option2 = select2.options[select2.selectedIndex].value;
+    
+    var key = keyfield.placeholder.replace(/\s/g, '');
+    var constraints = constraintsfield.placeholder.replace(/\s/g, '');
+    
+    console.log("option1: "+option1+" option2: "+option2+" key: "+key+" constraints: "+constraints);
+    
+    
 }
 
