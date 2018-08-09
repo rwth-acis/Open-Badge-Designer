@@ -140,7 +140,7 @@ function constructUI(){
     setAttributes(declarationsConstraintsField,
             ["rows","5"],
             ["cols","60"],
-            ["placeholder", "since : 2001-01-01T00:00:00Z,\nuntil : 2018-01-01T00:00:00Z,\nagent:{\"mbox\":\"mailto : maxmustermann@example.org\"},\nverb : http://www.example.org/verb,\nactivity : http://example.org/activity"],
+            ["placeholder", "since : 2001-01-01T00:00:00.000Z,\nuntil : 2019-01-01T00:00:00.000Z,\nagent:{\"mbox\":\"mailto : max.mustermann@example.com\"},\nverb : http://example.com/verbs/someEpicVerb,\nactivity : http://example.com/activities/someAmazingObject"],
             ["id", "declarationsconstraintsfield"]);
     
     // add a button to call a function to analyse the LRS on given declarations (TODO:: implement)
@@ -227,6 +227,17 @@ function checkXAPIConnection(){
 }
 
 function analyseXAPI(){
+    var backend = document.getElementById("backendfield").value;
+    var xapilocation = document.getElementById("urlfield").value;
+    var xapiauth = document.getElementById("authfield").value;
+    
+    if(backend == "")
+        backend = document.getElementById("backendfield").placeholder;
+    if(xapilocation == "")
+        xapilocation = document.getElementById("urlfield").placeholder;
+    if(xapiauth == "")
+        xapiauth = document.getElementById("authfield").placeholder;
+
     var select1 = document.getElementById("decselect1");
     var select2 = document.getElementById("decselect2");
     
@@ -241,6 +252,15 @@ function analyseXAPI(){
     
     console.log("option1: "+option1+" option2: "+option2+" key: "+key+" constraints: "+constraints);
     
+    $.ajax({
+        url: encodeURI(backend+"/analysexapi?url="+xapilocation+"&auth="+xapiauth+"&functionparam1="+option1+"&functionparam2="+option2+"&key="+key+"&constraints="+constraints)
+    }).then(function(data, status, jqxhr) {
+	    console.log("jqxhr: "+jqxhr);
+	    console.log("data: "+data);
+	    alert(data);
+    }).fail(function(xhr, status, error){
+        alert("Error: please check if a backend instance is running at the specified location.");
+    });
     
 }
 

@@ -50,6 +50,54 @@ public class ApplicationController {
     }
     
     @CrossOrigin()
+    @GetMapping("/analysexapi")
+    public String analyseXAPI(@RequestParam(name="functionparam1",required=true) String functionParam1,
+            @RequestParam(name="functionparam2",required=true) String functionParam2,
+            @RequestParam(name="key",required=true) String key,
+            @RequestParam(name="constraints",required=true) String constraints,
+            @RequestParam(name="url",required=false, defaultValue="EMPTYURL") String url, 
+            @RequestParam(name="auth",required=false, defaultValue="EMPTYAUTH") String auth){
+        System.out.println("External Component has made an xAPI analysation request.");
+        System.out.println("url: "+url);
+        System.out.println("auth: "+auth);
+        System.out.println("key: "+key);
+        System.out.println("constraints: "+constraints);
+        if(url.equals("EMPTYURL") || auth.equals("EMPTYAUTH"))
+            return "Insufficient Parameters";
+        
+        String[] separateConstraints = constraints.split(",");
+        String attachment = "";
+        if (separateConstraints.length > 0){
+            attachment = attachment + "?";
+            //int counter = 0;
+            for(String constraint: separateConstraints){
+                //if(counter == 3)
+                //    break;
+                //counter += 1;
+                if(!attachment.substring(attachment.length() - 1).equals("?"))
+                    attachment=attachment+"&";
+                attachment=attachment+constraint.replaceFirst(":","=");
+            }
+        }
+        
+        System.out.println("attachment: "+attachment);
+        Response response = sendXAPIRequest(url+"/statements", attachment, auth);
+        
+        String body = "uninitialized";
+	    try{
+	        body = response.body().string();
+	        System.out.println(body);
+	    }catch(Exception e){
+	        System.out.println("String of body could not be determined.");
+	    }
+        
+        System.out.println(response.toString());
+        System.out.println(response.message());
+        
+        return response.message();
+    }
+    
+    @CrossOrigin()
     @GetMapping("/xapitest")
     public String xAPItest(){
     
@@ -70,7 +118,7 @@ public class ApplicationController {
     
     private Response sendXAPIRequest(String url, String query, String auth){
         OkHttpClient client = new OkHttpClient();
-        System.out.println("Attempting to send xAPI request.");
+        System.out.println("Attempting to send xAPI request: "+query);
         Request request = new Request.Builder()
             .url(url+query)
             .get()
