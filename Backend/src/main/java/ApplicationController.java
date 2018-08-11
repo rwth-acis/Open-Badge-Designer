@@ -1,5 +1,9 @@
 package i5.obd.backend;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -8,6 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.OkHttpClient;
+
+import java.util.Map;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
+import jdk.nashorn.internal.runtime.JSONListAdapter;
 
 @RestController
 public class ApplicationController {
@@ -33,7 +45,7 @@ public class ApplicationController {
             return "Insufficient Parameters";
         System.out.println("External Component has made an xAPI connection check.");
         
-        Response response = sendXAPIRequest(url+"/statements", "?since=2018-07-28T00:01:00.360Z&limit=2", auth);
+        Response response = sendXAPIRequest(url, "/data/xAPI/statements"+"?since=2018-07-28T00:01:00.360Z&limit=2", auth);
         
         String body = "uninitialized";
 	    try{
@@ -62,39 +74,74 @@ public class ApplicationController {
         System.out.println("auth: "+auth);
         System.out.println("key: "+key);
         System.out.println("constraints: "+constraints);
+        
+        // TODO:: handle error message in Frontend
         if(url.equals("EMPTYURL") || auth.equals("EMPTYAUTH"))
             return "Insufficient Parameters";
         
+        // Split up constraints into separate Strings and use them to build a query for the LRS
         String[] separateConstraints = constraints.split(",");
         String attachment = "";
         if (separateConstraints.length > 0){
             attachment = attachment + "?";
-            //int counter = 0;
             for(String constraint: separateConstraints){
-                //if(counter == 3)
-                //    break;
-                //counter += 1;
                 if(!attachment.substring(attachment.length() - 1).equals("?"))
                     attachment=attachment+"&";
                 attachment=attachment+constraint.replaceFirst(":","=");
             }
         }
         
+        // add path to statements to attachment
+        attachment = "/data/xAPI/statements" + attachment;
+        
         System.out.println("attachment: "+attachment);
-        Response response = sendXAPIRequest(url+"/statements", attachment, auth);
         
-        String body = "uninitialized";
-	    try{
-	        body = response.body().string();
-	        System.out.println(body);
-	    }catch(Exception e){
-	        System.out.println("String of body could not be determined.");
-	    }
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("javascript");
         
-        System.out.println(response.toString());
-        System.out.println(response.message());
+        Response response;
         
-        return response.message();
+        do{
+            response = sendXAPIRequest(url, attachment, auth);
+            if(response == null)
+                break;
+            try{
+                // JSON is turned into a Java Map using a Javascript call to avoid unnecessary dependancies.
+                String javascript = "Java.asJSONCompatible(" + response.body().string() + ")";
+                Map body = (Map) engine.eval(javascript);
+            
+                System.out.println("more: " + body.get("more"));
+                
+                /*
+                    The parsed JSON turns into a format where Lists are handled as JSONListAdapter Objects
+                    and JSON Objects are handled as Objects which are essentially Maps, though not automatically
+                    recognized (thus the casting).
+                    
+                    To go deeper into JSON (not necessary in this version) it may be helpful to proceed
+                    recursively and check for each Object whether it's a JSON Object or a JSONListAdapter
+                */
+                JSONListAdapter statements = (JSONListAdapter)body.get("statements");
+                for(Object statement : statements.values()){
+                    Map stmtmap = (Map) statement;
+                    System.out.println("statement: " + stmtmap.get("timestamp"));
+                }
+                
+                System.out.println("============================================");
+                
+                if(body.get("more") == null || body.get("more").equals("")){
+                    System.out.println("more block is empty. exiting loop.");
+                    break;
+                }
+                
+                attachment = body.get("more").toString();
+            }catch(IOException|ScriptException se){
+                System.out.println("JSON Parsing failed!");
+                return "JSON Parsing failed!";
+            }
+        }while(true);
+        
+        
+        return "Everything seems to have worked.";
     }
     
     @CrossOrigin()

@@ -90,7 +90,7 @@ function constructUI(){
     var urlfield = document.createElement("INPUT");
     setAttributes(urlfield,
             ["type", "text"],
-            ["placeholder", "http://localhost/data/xAPI"],
+            ["placeholder", "http://localhost"],
             ["id", "urlfield"]);
     var urltext = document.createTextNode("Add URL of the statements section of your LRS here: ");
     
