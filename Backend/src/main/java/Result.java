@@ -1,5 +1,9 @@
 package i5.obd.backend;
 
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+
 /**
 * Result Objects are used to hold all values which are supposed to be returned to the Frontend.
 * The values can be extracted using toJSONString() to put it into a format that is easily readable
@@ -10,10 +14,10 @@ public class Result{
     private String status;
     
     /** the key used for the X-Axis on Frontend Graphs */
-    private keyX;
+    private String keyX;
     
     /** the key used for the Y-Axis on Frontend Graphs */
-    private keyY;
+    private String keyY;
     
     /** This List holds pairs of values which may be used for graphs in the Frontend. */
     private List<Pair> values;
@@ -38,8 +42,10 @@ public class Result{
         out = out + "\"keyY\":\"" + keyY + "\",";
         out = out + "\"values\":" + "[";
         for(Pair pair: values){
-            out = out + pair.toJSONString();
+            out = out + pair.toJSONString() + ",";
         }
+        if(values.size() > 0)
+            out = out.substring(0, out.length() - 1);
         out = out + "]";
         out = out + "}";
         return out;

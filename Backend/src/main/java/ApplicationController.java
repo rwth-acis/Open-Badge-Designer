@@ -22,6 +22,10 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import jdk.nashorn.internal.runtime.JSONListAdapter;
+
+import java.time.ZonedDateTime;
+
+
 /**
 * The RestController which handles all Requests to this Backend Application.
 * At the time of writing this, all methods in this class are either only used
@@ -143,6 +147,8 @@ public class ApplicationController {
         
         Response response;
         
+        List<String> values = new ArrayList<String>();
+        
         do{
             response = sendXAPIRequest(url, attachment, auth);
             if(response == null)
@@ -164,10 +170,8 @@ public class ApplicationController {
                     JSON Object or a JSONListAdapter
                 */
                 JSONListAdapter statements = (JSONListAdapter)body.get("statements");
-                List<String> values = getValuesAtKey(statements, key);
-                System.out.println(values.toString());
-                
-                System.out.println("============================================");
+                values.addAll(getValuesAtKey(statements, key));
+                System.out.println(statements);
                 
                 if(body.get("more") == null || body.get("more").equals("")){
                     System.out.println("more block is empty. exiting loop.");
@@ -181,8 +185,11 @@ public class ApplicationController {
             }
         }while(true);
         
+        Result result = compileResults(values, key);
+        result.setStatus("If this arrives things worked.");
+        result.setKeys("time","occurences");
         
-        return "Everything seems to have worked.";
+        return result.toJSONString();
     }
     
     /**
@@ -228,7 +235,7 @@ public class ApplicationController {
         Request request = new Request.Builder()
             .url(url+query)
             .get()
-            .addHeader("X-Experience-API-Version", "1.0.1")
+            .addHeader("X-Experience-API-Version", "1.0.3")
             .addHeader("Authorization", auth)
             .addHeader("Cache-Control", "no-cache")
             .build();
@@ -258,6 +265,22 @@ public class ApplicationController {
         }
         
         return result;
+    }
+    
+    private Result compileResults(List<String> in, String key){
+        Result res = new Result();
+        if(key.equals("timestamp")){
+            int[] counter = new int[24];
+            for(String timestamp : in){
+                System.out.println("timestamp: "+timestamp);
+                ZonedDateTime time = ZonedDateTime.parse(timestamp);
+                counter[time.getHour()]++;
+            }
+            for(int i=0; i<counter.length; i++){
+                res.addPair(i, counter[i]);
+            }
+        }
+        return res;
     }
 
 }

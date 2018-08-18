@@ -25,6 +25,10 @@ public class Pair{
         this.valueY = valueY;
     }
     
+    public String toJSONString(){
+        return "["+valueX+","+valueY+"]";
+    }
+    
     /** Getter.
     * @return the X value of this Pair
     */
