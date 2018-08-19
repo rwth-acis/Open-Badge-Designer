@@ -114,7 +114,8 @@ public class ApplicationController {
             @RequestParam(name="key",required=true) String key,
             @RequestParam(name="constraints",required=true) String constraints,
             @RequestParam(name="url",required=false, defaultValue="EMPTYURL") String url, 
-            @RequestParam(name="auth",required=false, defaultValue="EMPTYAUTH") String auth){
+            @RequestParam(name="auth",required=false, defaultValue="EMPTYAUTH") String auth,
+            @RequestParam(name="recommend",required=true) String recommend){
         System.out.println("External Component has made an xAPI analysation request.");
         System.out.println("url: "+url);
         System.out.println("auth: "+auth);
