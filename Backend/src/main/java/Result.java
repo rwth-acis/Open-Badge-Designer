@@ -123,11 +123,19 @@ public class Result{
         values.add(valuePair);
     }
     
-    /** Adds a pair to the values List. Depending on use it may be recommended to have no duplicate X-Values.
+    /** Adds a pair to the values List with X as Integer. Depending on use it may be recommended to have no duplicate X-Values.
     * @param valueX the value for the X-Axis
     * @param valueY the value for the Y-Axis
     */
     public void addPair(Integer valueX, Integer valueY){
+        values.add(new Pair(valueX, valueY));
+    }
+    
+    /** Adds a pair to the values List with X as String. Depending on use it may be recommended to have no duplicate X-Values.
+    * @param valueX the value for the X-Axis
+    * @param valueY the value for the Y-Axis
+    */
+    public void addPair(String valueX, Integer valueY){
         values.add(new Pair(valueX, valueY));
     }
 

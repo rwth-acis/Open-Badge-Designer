@@ -14,8 +14,12 @@ import okhttp3.Response;
 import okhttp3.OkHttpClient;
 
 import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+
+import java.lang.NumberFormatException;
+import java.lang.Integer;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -24,6 +28,7 @@ import javax.script.ScriptException;
 import jdk.nashorn.internal.runtime.JSONListAdapter;
 
 import java.time.ZonedDateTime;
+import java.time.DayOfWeek;
 
 
 /**
@@ -189,7 +194,7 @@ public class ApplicationController {
         Result result = compileResults(values, key);
         result.setStatus("If this arrives things worked.");
         result.setKeys("time","occurences");
-        
+        System.out.println("received and updated results. returning JSON String...");
         return result.toJSONString();
     }
     
@@ -270,17 +275,121 @@ public class ApplicationController {
     
     private Result compileResults(List<String> in, String key){
         Result res = new Result();
-        if(key.equals("timestamp")){
-            int[] counter = new int[24];
-            for(String timestamp : in){
-                System.out.println("timestamp: "+timestamp);
-                ZonedDateTime time = ZonedDateTime.parse(timestamp);
-                counter[time.getHour()]++;
-            }
-            for(int i=0; i<counter.length; i++){
-                res.addPair(i, counter[i]);
+        
+        int min_groups = 2;
+        int max_groups = 500;
+        int min_value = Integer.MAX_VALUE;
+        int max_value = Integer.MIN_VALUE;
+        boolean countable = true; // are values countable (currently only integers supported as countable)
+        boolean groupable = false;
+        
+        System.out.println("finding min/max values if possible");
+        
+        // find min/max values if all values can be parsed as Integer
+        int min_temp = Integer.MAX_VALUE;
+        int max_temp = Integer.MIN_VALUE;
+        for (String s : in){
+            try{
+                int val = Integer.parseInt(s);
+                if (val < min_temp)
+                    min_temp = val;
+                if (val > max_temp)
+                    max_temp = val;
+            }catch(NumberFormatException nfe){
+                System.out.println("values not automatically recognised as countable");
+                countable = false;
+                break;
             }
         }
+        
+        // switch applies presets for custom values.
+        // TODO:: handle incorrect timestamp format if this is possible to occur
+        if(key.equals("timestamp"))
+            System.out.println("Key 'timestamp' replaced with 'hour'");
+            key = "hour";
+        switch(key){
+            case "hour":
+                countable = true;
+                min_value = 0;
+                max_value = 23;
+                
+                in.replaceAll(timestamp -> Integer.toString(ZonedDateTime.parse(timestamp).getHour()));
+                //for (String timestamp: in){
+                //    timestamp = Integer.toString(ZonedDateTime.parse(timestamp).getHour());
+                //}
+                System.out.println("key recognised as hour. Edited input list: "+in.toString());
+                break;
+            case "day":
+                countable = true;
+                min_value = 1;
+                max_value = 31;
+                for (String timestamp: in){
+                    timestamp = Integer.toString(ZonedDateTime.parse(timestamp).getDayOfWeek().getValue());
+                }
+                System.out.println("key recognised as day");
+                break;
+            case "month":
+                countable = true;
+                min_value = 1;
+                max_value = 12;
+                for (String timestamp: in){
+                    timestamp = Integer.toString(ZonedDateTime.parse(timestamp).getMonth().getValue());
+                }
+                System.out.println("key recognised as month");
+                break;
+            default:
+                if (countable){
+                    min_value = min_temp;
+                    max_value = max_temp;
+                }
+        }
+        
+        System.out.println("building HashMap to count entries per default Group...");
+        // count occurrences per value
+        HashMap<String, Integer> groupCount = new HashMap<String, Integer>();
+        for(String s: in){
+            groupCount.put(s , 1 + (groupCount.containsKey(s) ? groupCount.get(s) : 0));
+        }
+        
+        // group elements on datasets with too many distinct values
+        if(countable && groupCount.size() > max_groups){
+            System.out.println("too many distinct groups, attempting to merge");
+            int div = max_groups;
+            int size = groupCount.size();
+            while (size % div != 0){
+                div--;
+                if(div < min_groups)
+                    break;
+            }
+            if (div >= min_groups){
+                HashMap<String, Integer> tempMap = new HashMap<String, Integer>();
+                int group_width = size / div;
+                // group up keys of the groupCount HashMap and sum up their values
+                for (Map.Entry<String, Integer> entry: groupCount.entrySet()){
+                    Integer eKey = Integer.parseInt(entry.getKey());
+                    Integer eValue = entry.getValue();
+                    
+                    int keyGroupStart = (int) (Math.floor((eKey - min_value) / group_width) * group_width + 1);
+                    int keyGroupEnd = keyGroupStart + group_width - 1;
+                    String keyGroup = keyGroupStart + " , " + keyGroupEnd;
+                    tempMap.put(keyGroup, eValue + (tempMap.containsKey(keyGroup) ? tempMap.get(keyGroup) : 0));
+                }
+                groupCount = tempMap;
+                groupable = true;
+            }else{
+                // no grouping could be found.
+                groupable = false;
+            } 
+        }else{
+            groupable = true;
+        }
+        System.out.println("Adding key-value pairs to results");
+        // add results to res to return them (possibly temporary?)
+        for(Map.Entry<String, Integer> entry: groupCount.entrySet()){
+            res.addPair(entry.getKey(), entry.getValue());
+        }
+        
+        System.out.println("Returning results");
         return res;
     }
 

@@ -526,7 +526,7 @@ function analyseXAPI(){
         var canvas = document.getElementById("canvas1");
         var chart = new Chart(canvas,
             {   
-                type: 'line',
+                type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [
@@ -578,7 +578,7 @@ function analyseXAPI(){
             var canvas = document.getElementById("canvas2");
             var chart = new Chart(canvas,
                 {   
-                    type: 'line',
+                    type: 'bar',
                     data: {
                         labels: labels,
                         datasets: [
