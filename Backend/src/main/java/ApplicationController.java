@@ -192,8 +192,6 @@ public class ApplicationController {
         }while(true);
         
         Result result = compileResults(values, key);
-        result.setStatus("If this arrives things worked.");
-        result.setKeys("time","occurences");
         System.out.println("received and updated results. returning JSON String...");
         return result.toJSONString();
     }
@@ -388,6 +386,13 @@ public class ApplicationController {
         for(Map.Entry<String, Integer> entry: groupCount.entrySet()){
             res.addPair(entry.getKey(), entry.getValue());
         }
+        
+        System.out.println("Attempting to generate Badge Recommendations");
+        BadgeGenerator gen = new BadgeGenerator();
+        gen.generateBadges(res.getValues(), groupable, countable, min_value, max_value);
+        
+        res.setStatus("Status OK.");
+        res.setKeys(key,"occurences");
         
         System.out.println("Returning results");
         return res;

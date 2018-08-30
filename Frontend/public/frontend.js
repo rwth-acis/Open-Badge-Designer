@@ -419,6 +419,11 @@ function setAttributes(elem /*[attribute, value] pairs can be passed here*/){
     }
 }
 
+// TODO:: make sure this works with both strings and numbers
+function compareKeys(a, b){
+    return a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0;
+}
+
 function setConnection(){
     
     window.backend = document.getElementById("backendfield").value;
@@ -514,11 +519,13 @@ function analyseXAPI(){
 	    var results = JSON.parse(data);
 	    alert(results.status);
 	    
+	    var rv = results.values.sort(compareKeys);
+	    
 	    var labels = [];
         var values = [];
-        for(var i=0; i<results.values.length; i++){
-            labels.push(results.values[i][0]);
-            values.push(results.values[i][1]);
+        for(var i=0; i<rv.length; i++){
+            labels.push(rv[i][0]);
+            values.push(rv[i][1]);
         }
         console.log(labels);
         console.log(values);
@@ -540,7 +547,8 @@ function analyseXAPI(){
                         xAxes: [{
                             scaleLabel: {
                                 display: true,
-                                labelString: results.keyX
+                                labelString: results.keyX,
+                                type: 'time'
                             }
                         }],
                         yAxes: [{
@@ -572,6 +580,7 @@ function analyseXAPI(){
                 labels.push(results.values[i][0]);
                 values.push(results.values[i][1]);
             }
+            labels 
             console.log(labels);
             console.log(values);
             
@@ -592,7 +601,8 @@ function analyseXAPI(){
                             xAxes: [{
                                 scaleLabel: {
                                     display: true,
-                                    labelString: results.keyX
+                                    labelString: results.keyX,
+                                    type: 'time'
                                 }
                             }],
                             yAxes: [{
