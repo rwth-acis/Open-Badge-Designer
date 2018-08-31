@@ -369,7 +369,7 @@ public class ApplicationController {
                     
                     int keyGroupStart = (int) (Math.floor((eKey - min_value) / group_width) * group_width + 1);
                     int keyGroupEnd = keyGroupStart + group_width - 1;
-                    String keyGroup = keyGroupStart + " , " + keyGroupEnd;
+                    String keyGroup = (int) (keyGroupStart + keyGroupEnd / 2);
                     tempMap.put(keyGroup, eValue + (tempMap.containsKey(keyGroup) ? tempMap.get(keyGroup) : 0));
                 }
                 groupCount = tempMap;

@@ -18,6 +18,8 @@ public class Badge{
     
     private String issuer;
     
+    private String notes;
+    
     public Badge(){
         this.name = "A new Badge";
         this.description = "Earned by fulfilling the criteria!";
@@ -26,6 +28,7 @@ public class Badge{
         this.criteria = "This and that and another thing must be fulfilled.";
         this.criteriaMachineReadable = "";
         this.issuer = "http://example.com/issuers/YOURNAME.json";
+        this.notes = "";
     }
     
     public Badge(String name, String description, String imageURI, String criteriaURI, String criteria, String criteriaMachineReadable, String issuer){
@@ -36,6 +39,7 @@ public class Badge{
         this.criteria = criteria;
         this.criteriaMachineReadable = criteriaMachineReadable;
         this.issuer = issuer;
+        this.notes = "";
     }
     
     // Getters
