@@ -48,7 +48,7 @@ public class BadgeGenerator{
         (Max-Min) -> width , for occurrence: SUM_of_all_occurrence_counts
         (width/5) -> width of first quintile , check which values are in it
     */
-    
+    //TODO:: a lot of this code is basically pseudocode. Get it to actually run later.
     private Badge addSumBadge(List<Pair> values, key){
         int newSum = 0;
         for (Pair pair: values){
@@ -62,10 +62,36 @@ public class BadgeGenerator{
         badge.setCriteria("Reach a total SUM of %s on the values of xAPI key %s" % (key));
         badge.setCriteriaMachineReadable("%s,SUM[value]>%s,1" % (key, newSum)); //with key X , the sum of all values must be greater than Y once
         badge.setNotes("This Badge is scaled by 3 * the total sum for all included users. This value may be much too large if data for all agents is used for a single user. Please adjust.");
+        this.badges.append(badge);
     }
     
-    private Badge addUncommonBadge(List<Pair> values, key){
+    private Badge addUncommonBadge(List<Pair> values, key){ //IS THE LIST SORTED??? If not, this won't work! (sort it first)
     // get values in least common range n times
+        int totalOccurrences = 0;
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        for (Pair pair: values){
+            totalOccurrences += pair.getY;
+            if(pair.getY() < min)
+                min = pair.getY();
+            if(pair.getY() > max)
+                max = pair.getY();
+        }
+        int uncommonThreshold = ((max-min)/5)+min;
+        List<String> values = new ArrayList<String>();
+        boolean groupStarted = false;
+        for (Pair pair: values){
+            if (pair.getY() < uncommonThreshold){
+                groupStarted = true;
+                values.append(pair.getY());
+            }else if(groupStarted){
+                break;
+            }
+        }
+        
+        Badge.badge = new Badge();
+        badge.setCriteria("Get an entry between %s and %s 3 times.");
+        badge.setCriteriaMachineReadable("%s,value<%s&value>%s,3" % (key, val_max, val_min));
     }
     
     private Badge addCommonBadge(List<Pair> values, key){
