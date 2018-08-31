@@ -117,6 +117,8 @@ public class ApplicationController {
     public String analyseXAPI(@RequestParam(name="functionparam1",required=true) String functionParam1,
             @RequestParam(name="functionparam2",required=true) String functionParam2,
             @RequestParam(name="key",required=true) String key,
+            @RequestParam(name="objectid",required=true) String objectID,
+            @RequestParam(name="actionid",required=true) String actionID,
             @RequestParam(name="constraints",required=true) String constraints,
             @RequestParam(name="url",required=false, defaultValue="EMPTYURL") String url, 
             @RequestParam(name="auth",required=false, defaultValue="EMPTYAUTH") String auth,
@@ -191,7 +193,7 @@ public class ApplicationController {
             }
         }while(true);
         
-        Result result = compileResults(values, key);
+        Result result = compileResults(values, key, actionID, objectID);
         System.out.println("received and updated results. returning JSON String...");
         return result.toJSONString();
     }
@@ -271,7 +273,7 @@ public class ApplicationController {
         return result;
     }
     
-    private Result compileResults(List<String> in, String key){
+    private Result compileResults(List<String> in, String key, String actionID, String objectID){
         Result res = new Result();
         
         int min_groups = 2;
@@ -369,7 +371,7 @@ public class ApplicationController {
                     
                     int keyGroupStart = (int) (Math.floor((eKey - min_value) / group_width) * group_width + 1);
                     int keyGroupEnd = keyGroupStart + group_width - 1;
-                    String keyGroup = (int) (keyGroupStart + keyGroupEnd / 2);
+                    String keyGroup = Integer.toString((int) (keyGroupStart + keyGroupEnd / 2));
                     tempMap.put(keyGroup, eValue + (tempMap.containsKey(keyGroup) ? tempMap.get(keyGroup) : 0));
                 }
                 groupCount = tempMap;
@@ -388,8 +390,14 @@ public class ApplicationController {
         }
         
         System.out.println("Attempting to generate Badge Recommendations");
+        
         BadgeGenerator gen = new BadgeGenerator();
-        gen.generateBadges(res.getValues(), groupable, countable, min_value, max_value);
+        gen.generateBadges(res.getValues(), key, actionID, objectID, groupable, countable, min_value, max_value);
+        List<Badge> badges = gen.getBadges();
+        
+        for (Badge badge: badges){
+            System.out.println(badge.getCriteriaMachineReadable());
+        }
         
         res.setStatus("Status OK.");
         res.setKeys(key,"occurences");

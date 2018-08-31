@@ -102,5 +102,9 @@ public class Badge{
         this.issuer = issuer;
     }
     
+    public void setNotes(String notes){
+        this.notes = notes;
+    }
+    
     
 }
