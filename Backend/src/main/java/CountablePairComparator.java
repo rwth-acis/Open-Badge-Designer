@@ -20,6 +20,7 @@ public class CountablePairComparator implements Comparator<Pair>{
             out = Integer.parseInt(a);
         } catch(NumberFormatException nfe){
             System.out.println("Compared String did not contain Integer!");
+            System.out.println(a);
             return Integer.MAX_VALUE;
         }
         return out;

@@ -16,6 +16,8 @@ var until2 = "";
 var option1;
 var option2;
 var key;
+var object;
+var action;
 var constraints;
 
 $(document).ready(function(){
@@ -260,7 +262,8 @@ function appendDivWithDeclarationsUI(elem){
     var text = document.createTextNode("To visualize xAPI data and gain recommendations, please fill in the following information:");
     var textP = document.createElement("p");
         textP.appendChild(text);
-        
+    
+    /*
     var select1 = document.createElement("SELECT");
         select1.setAttribute("id", "decselect1");
         var option1_1 = document.createElement("OPTION");
@@ -280,18 +283,37 @@ function appendDivWithDeclarationsUI(elem){
         var option2_2 = document.createElement("OPTION");
             option2_2.appendChild(document.createTextNode("Occurrence"));
             option2_2.setAttribute("value", "occur");
-            select2.appendChild(option2_2);
+            select2.appendChild(option2_2);*/
     var keyField = document.createElement("INPUT");
     setAttributes(keyField,
             ["type", "text"],
             ["placeholder", "timestamp"],
             ["id", "declarationskeyfield"]);
-    var keyText = document.createTextNode("(the xAPI key to process)");
-    var selectP = document.createElement("p");
-    appendChildren(selectP, select1, select2, keyField, keyText);
-            
+    var objectField = document.createElement("INPUT");
+    setAttributes(objectField,
+            ["type", "text"],
+            ["placeholder", "http://example.com/activities/someAmazingObject"],
+            ["id", "declarationsobjectfield"]);
+    var actionField = document.createElement("INPUT");
+    setAttributes(actionField,
+            ["type", "text"],
+            ["placeholder", "http://example.com/verbs/someEpicVerb"],
+            ["id", "declarationsactionfield"]);
+    //TODO:: add link to wiki (once created) to explain options on input
+    var keyText = document.createTextNode("The xAPI statement-key to use.");
+    var objectText = document.createTextNode("The xAPI activity (object) to check for.");
+    var actionText = document.createTextNode("The xAPI verb (action) to check for.");
+    //var selectP = document.createElement("p");
+    //appendChildren(selectP, select1, select2, keyField, keyText);
+    var keyP = document.createElement("p");
+    var objectP = document.createElement("p");
+    var actionP = document.createElement("p");
     
-    var constraintsText = document.createTextNode("The following allows to set constraints in comma-separated key:value pairs");
+    appendChildren(keyP, keyText, keyField);
+    appendChildren(actionP, actionText, actionField);
+    appendChildren(objectP, objectText, objectField);      
+    
+    var constraintsText = document.createTextNode("The following allows to set additional constraints in comma-separated key:value pairs (optional)");
     var constraintsTextP = document.createElement("p");
         constraintsTextP.appendChild(constraintsText);
     
@@ -336,7 +358,7 @@ function appendDivWithDeclarationsUI(elem){
         setButtonP.appendChild(setButton);
         setButtonP.style.textAlign = 'right';
         
-    appendChildren(declareDiv, textP, selectP, constraintsTextP, constraintsFieldP, timeTextP, sinceUntilP, sinceUntilCompareP, setButtonP);
+    appendChildren(declareDiv, textP, keyP, actionP, objectP, constraintsTextP, constraintsFieldP, timeTextP, sinceUntilP, sinceUntilCompareP, setButtonP);
     
     elem.appendChild(declareDiv);
 }
@@ -360,7 +382,7 @@ function appendDivWithAnalyticsUI(elem, canvasName){
     
     elem.append(analyticsDiv);
 }
-/*
+/* TODO:: Remove this.
     The UI could alternatively be made directly as part of HTML with CSS styling.
     The constructUI() function is simply there to make it easier to add this frontend
     to any existing page without major changes. All that's needed is a div tag with
@@ -419,7 +441,7 @@ function setAttributes(elem /*[attribute, value] pairs can be passed here*/){
     }
 }
 
-// TODO:: make sure this works with both strings and numbers
+// TODO:: make sure this works with both strings and numbers (I think it does?)
 function compareKeys(a, b){
     return a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0;
 }
@@ -465,17 +487,28 @@ function setXAPIConnection(){
 }
 
 function setDeclarations(){
-    var select1 = document.getElementById("decselect1");
-    var select2 = document.getElementById("decselect2");
+    //var select1 = document.getElementById("decselect1");
+    //var select2 = document.getElementById("decselect2");
     
-    window.option1 = select1.options[select1.selectedIndex].value;
-    window.option2 = select2.options[select2.selectedIndex].value;
+    //window.option1 = select1.options[select1.selectedIndex].value;
+    //window.option2 = select2.options[select2.selectedIndex].value;
     
-    var keyfield = document.getElementById("declarationskeyfield");
-    var constraintsfield = document.getElementById("declarationsconstraintsfield");
+    var keyField = document.getElementById("declarationskeyfield");
+    var objectField = document.getElementById("declarationsobjectfield");
+    var actionField = document.getElementById("declarationsactionfield");
+    var constraintsField = document.getElementById("declarationsconstraintsfield");
     
-    window.key = keyfield.placeholder.replace(/\s/g, '');
-    window.constraints = constraintsfield.placeholder.replace(/\s/g, '');
+    window.key = keyField.value.replace(/\s/g,'');
+    if (window.key == "")
+        window.key = keyField.placeholder.replace(/\s/g, '');
+    console.log(window.key);
+    window.object = objectField.value.replace(/\s/g, '');
+    if (window.object == "")
+        window.object = objectField.placeholder.replace(/\s/g, '');
+    window.action = actionField.value.replace(/\s/g, '');
+    if (window.action == "")
+        window.action = actionField.placeholder.replace(/\s/g, '');
+    window.constraints = constraintsField.value.replace(/\s/g, '');
     
     var since1Field = document.getElementById("sincefield");
     var since2Field = document.getElementById("sincefieldc");
@@ -506,10 +539,16 @@ function analyseXAPI(){
     
     setDeclarations();
     
-    console.log("option1: "+window.option1+" option2: "+window.option2+" key: "+window.key+" constraints: "+window.constraints);
+    console.log("key: "+window.key+" constraints: "+window.constraints);
     
-    var uriString = window.backend + "/analysexapi?url=" + window.lrs + "&auth=" + window.auth + "&functionparam1=" + window.option1 +
-                    "&functionparam2=" + window.option2 + "&key="+window.key + "&recommend=" + (!window.twoFields).toString() + "&constraints=" + window.constraints;
+    var uriString = window.backend 
+                    + "/analysexapi?url=" + window.lrs 
+                    + "&auth=" + window.auth 
+                    + "&key=" + window.key 
+                    + "&objectid=" + window.object 
+                    + "&actionid=" + window.action 
+                    + "&recommend=" + (!window.twoFields).toString() 
+                    + "&constraints=" + window.constraints;
     
     $.ajax({
         url: encodeURI(uriString + ",since:" + window.since1 + ",until:" + window.until1)

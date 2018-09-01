@@ -67,14 +67,14 @@ public class BadgeGenerator{
         newSum = 3 * newSum;
     
         Badge badge = new Badge();
-        badge.setCriteria(String.format("Reach a total SUM of %s on the values of xAPI key %s", key));
+        badge.setCriteria(String.format("Reach a total SUM of %s on the values of xAPI key %s for action %s on Object %s", newSum, key, actionID, objectID));
         badge.setCriteriaMachineReadable(String.format("{object: %s, action: %s, key: %s, condition: \"SUM[value]>%s\", repetitions: 1}", objectID, actionID, key, newSum)); 
         //with key X , the sum of all values must be greater than Y once
         badge.setNotes("This Badge is scaled by 3 * the total sum for all included users. This value may be much too large if data for all agents is used for a single user. Please adjust.");
         this.badges.add(badge);
     }
     
-    private void addUncommonBadge(List<Pair> values, String key, String actionID, String objectID, boolean countable){ //IS THE LIST SORTED??? If not, this won't work! (sort it first)
+    private void addUncommonBadge(List<Pair> values, String key, String actionID, String objectID, boolean countable){
     // get values in least common range n times
         int totalOccurrences = 0;
         int min = Integer.MAX_VALUE;
@@ -88,15 +88,15 @@ public class BadgeGenerator{
         }
             
         int uncommonThreshold = ((max-min)/5)+min;
-        int first_value = Integer.MAX_VALUE;
-        int last_value = Integer.MAX_VALUE;
+        String first_value = "Nope. Nope. Nope.";
+        String last_value = "Not intended to show. Ever.";
         boolean groupStarted = false;
         for (Pair pair: values){
             if (pair.getValueY() < uncommonThreshold){
                 if (!groupStarted)
-                    first_value = pair.getValueY();
+                    first_value = pair.getValueX();
                 groupStarted = true;
-                last_value = pair.getValueY();
+                last_value = pair.getValueX();
             }else if(groupStarted){
                 break;
             }
@@ -127,16 +127,16 @@ public class BadgeGenerator{
                 max = pair.getValueY();
         }
             
-        int uncommonThreshold = ((max-min)/5)+min;
-        int first_value = Integer.MAX_VALUE;
-        int last_value = Integer.MAX_VALUE;
+        int commonThreshold = (((max-min)/5)*4)+min;
+        String first_value = "This should never show!";
+        String last_value = "This should never show!";
         boolean groupStarted = false;
         for (Pair pair: values){
-            if (pair.getValueY() > uncommonThreshold*4){
+            if (pair.getValueY() > commonThreshold){
                 if (!groupStarted)
-                    first_value = pair.getValueY();
+                    first_value = pair.getValueX();
                 groupStarted = true;
-                last_value = pair.getValueY();
+                last_value = pair.getValueX();
             }else if(groupStarted){
                 break;
             }
@@ -156,28 +156,29 @@ public class BadgeGenerator{
     
     private void addHighBadge(List<Pair> values, String key, String actionID, String objectID){
     // get values above X n times. (increase occur of highest values)
-        int totalOccurrences = 0;
+        int totalSum = 0;
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
         for (Pair pair: values){
-            totalOccurrences += Integer.parseInt(pair.getValueX());
-            if(Integer.parseInt(pair.getValueX()) < min)
-                min = Integer.parseInt(pair.getValueX());
-            if(Integer.parseInt(pair.getValueX()) > max)
-                max = Integer.parseInt(pair.getValueX());
+            int val_x = Integer.parseInt(pair.getValueX());
+            totalSum += val_x;
+            if(val_x < min)
+                min = val_x;
+            if(val_x > max)
+                max = val_x;
         }
             
-        int uncommonThreshold = ((max-min)/5)+min;
+        int highThreshold = (((max-min)/5)*4)+min;
         String first_value = "ThisShouldNeverShow";
-        String last_value = "ThisShouldNeverShow";
+        String last_value = "ThisValueMeansError";
         boolean groupStarted = false;
         for (Pair pair: values){
             int val_x = Integer.parseInt(pair.getValueX());
-            if (val_x < uncommonThreshold){
+            if (val_x > highThreshold){
                 if (!groupStarted)
-                    first_value = Integer.toString(val_x);
+                    first_value = pair.getValueX();
                 groupStarted = true;
-                last_value = Integer.toString(val_x);
+                last_value = pair.getValueX();
             }else if(groupStarted){
                 break;
             }
@@ -191,29 +192,29 @@ public class BadgeGenerator{
     
     private void addLowBadge(List<Pair> values, String key, String actionID, String objectID){
     // get values below X n times (increase occur of lowest values)
-        int totalOccurrences = 0;
+        int totalSum = 0;
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
         for (Pair pair: values){
             int val_x = Integer.parseInt(pair.getValueX());
-            totalOccurrences += val_x;
+            totalSum += val_x;
             if(val_x < min)
                 min = val_x;
             if(val_x > max)
                 max = val_x;
         }
             
-        int uncommonThreshold = ((max-min)/5)+min;
-        String first_value = "ThisShouldNeverShow";
-        String last_value = "ThisShouldNeverShow";
+        int lowThreshold = ((max-min)/5)+min;
+        String first_value = "SomethingWentWrong";
+        String last_value = "PleaseConsiderContactingSomeone";
         boolean groupStarted = false;
         for (Pair pair: values){
             int val_x = Integer.parseInt(pair.getValueX());
-            if (val_x > uncommonThreshold * 4){
+            if (val_x < lowThreshold){
                 if (!groupStarted)
-                    first_value = Integer.toString(val_x);
+                    first_value = pair.getValueX();
                 groupStarted = true;
-                last_value = Integer.toString(val_x);
+                last_value = pair.getValueX();
             }else if(groupStarted){
                 break;
             }

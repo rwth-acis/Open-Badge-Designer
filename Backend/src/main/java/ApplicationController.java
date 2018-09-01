@@ -114,8 +114,7 @@ public class ApplicationController {
     */
     @CrossOrigin()
     @GetMapping("/analysexapi")
-    public String analyseXAPI(@RequestParam(name="functionparam1",required=true) String functionParam1,
-            @RequestParam(name="functionparam2",required=true) String functionParam2,
+    public String analyseXAPI(
             @RequestParam(name="key",required=true) String key,
             @RequestParam(name="objectid",required=true) String objectID,
             @RequestParam(name="actionid",required=true) String actionID,
@@ -178,7 +177,11 @@ public class ApplicationController {
                     JSON Object or a JSONListAdapter
                 */
                 JSONListAdapter statements = (JSONListAdapter)body.get("statements");
-                values.addAll(getValuesAtKey(statements, key));
+                if (key.equals("hour") || key.equals("day") || key.equals("month")){
+                    values.addAll(getValuesAtKey(statements, "timestamp"));
+                }else{
+                    values.addAll(getValuesAtKey(statements, key));
+                }
                 System.out.println(statements);
                 
                 if(body.get("more") == null || body.get("more").equals("")){
@@ -304,9 +307,11 @@ public class ApplicationController {
         
         // switch applies presets for custom values.
         // TODO:: handle incorrect timestamp format if this is possible to occur
-        if(key.equals("timestamp"))
+        System.out.println("key right before switch: " + key);
+        if(key.equals("timestamp")){
             System.out.println("Key 'timestamp' replaced with 'hour'");
             key = "hour";
+        }
         switch(key){
             case "hour":
                 countable = true;
@@ -314,27 +319,25 @@ public class ApplicationController {
                 max_value = 23;
                 
                 in.replaceAll(timestamp -> Integer.toString(ZonedDateTime.parse(timestamp).getHour()));
-                //for (String timestamp: in){
-                //    timestamp = Integer.toString(ZonedDateTime.parse(timestamp).getHour());
-                //}
+                
                 System.out.println("key recognised as hour. Edited input list: "+in.toString());
                 break;
             case "day":
                 countable = true;
                 min_value = 1;
-                max_value = 31;
-                for (String timestamp: in){
-                    timestamp = Integer.toString(ZonedDateTime.parse(timestamp).getDayOfWeek().getValue());
-                }
+                max_value = 7;
+                
+                in.replaceAll(timestamp -> Integer.toString(ZonedDateTime.parse(timestamp).getDayOfWeek().getValue()));
+                
                 System.out.println("key recognised as day");
                 break;
             case "month":
                 countable = true;
                 min_value = 1;
                 max_value = 12;
-                for (String timestamp: in){
-                    timestamp = Integer.toString(ZonedDateTime.parse(timestamp).getMonth().getValue());
-                }
+                
+                in.replaceAll(timestamp -> Integer.toString(ZonedDateTime.parse(timestamp).getMonth().getValue()));
+                
                 System.out.println("key recognised as month");
                 break;
             default:
