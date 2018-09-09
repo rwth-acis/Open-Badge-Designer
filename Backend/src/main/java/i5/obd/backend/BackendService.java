@@ -1,17 +1,19 @@
 package i5.obd.backend;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import javax.net.ssl.HttpsURLConnection;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RestController;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.OkHttpClient;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -28,19 +30,27 @@ import javax.script.ScriptException;
 import jdk.nashorn.internal.runtime.JSONListAdapter;
 
 import java.time.ZonedDateTime;
-import java.time.DayOfWeek;
 
-
-/**
-* The RestController which handles all Requests to this Backend Application.
-* At the time of writing this, all methods in this class are either only used
-* internally (private) or accessible via HTTP GET calls from any source (CrossOrigin).
-*/
-@RestController
-public class ApplicationController {
-
-
-    /**
+@Path("")
+public class BackendService {
+	@GET
+	@Path("/{name}")
+	public Response getMsg(@PathParam("name") String name) {
+		String output = "Welcome : " + name;
+		return corsResponseBuilder(200, output);
+	}
+	@GET
+	@Path("/ttest")
+	public Response getTest() {
+		String output = "TestTestTest";
+		return corsResponseBuilder(200,output);
+	}
+	
+	/////////////////////////////////////////////////////////////////
+	
+	
+	
+	/**
     * This method implements a simple connection check, allowing a Frontend instance
     * to request an answer from the Backend.
     *
@@ -51,11 +61,11 @@ public class ApplicationController {
     * @param msg (Optional) the custom message to return to sender.
     * @return the custom message if chosen in the Frontend or the default message
     */
-    @CrossOrigin()
-    @GetMapping("/checkconnection")
-    public String checkConnection(@RequestParam(name="msg",required=false, defaultValue="Connection confirmed!") String result) {
+    @GET
+    @Path("/checkconnection")
+    public Response checkConnection(@DefaultValue("Connection confirmed!") @QueryParam("msg") String result) {
         System.out.println("External Component has made a connection check.");
-        return result;
+        return corsResponseBuilder(200, result);
     }
     
     
@@ -72,30 +82,31 @@ public class ApplicationController {
     * @param auth (Optional) the HTTP authentication string used to access the LRS
     * @return the success status of the connection
     */
-    @CrossOrigin()
-    @GetMapping("/checkxapiconnection")
-    public String checkXAPIConnection(@RequestParam(name="url",required=false, defaultValue="EMPTYURL") String url, 
-            @RequestParam(name="auth",required=false, defaultValue="EMPTYAUTH") String auth){
+    @GET
+    @Path("/checkxapiconnection")
+    public Response checkXAPIConnection(@DefaultValue("EMPTYURL") @QueryParam("url") String url,
+            @DefaultValue("EMPTYAUTH") @QueryParam("auth") String auth){
+
         System.out.println(url);
         System.out.println(auth);
         if(url.equals("EMPTYURL") || auth.equals("EMPTYAUTH"))
-            return "Insufficient Parameters";
+            return corsResponseBuilder(200, "Insufficient Parameters");
         System.out.println("External Component has made an xAPI connection check.");
         
-        Response response = sendXAPIRequest(url, "/data/xAPI/statements"+"?since=2018-07-28T00:01:00.360Z&limit=2", auth);
+        String response;
+		try {
+			response = sendXAPIRequest(url, "/data/xAPI/statements"+"?since=2018-07-28T00:01:00.360Z&limit=2", auth);
+			System.out.println("response received, attempting to return.");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("sendXAPIRequest failed.");
+			return corsResponseBuilder(200, "sendXAPIRequest failed.");
+		}
         
-        String body = "uninitialized";
-	    try{
-	        body = response.body().string();
-	        System.out.println(body);
-	    }catch(Exception e){
-	        System.out.println("String of body could not be determined.");
-	    }
+	    System.out.println(response);
         
-        System.out.println(response.toString());
-        System.out.println(response.message());
-        
-        return response.message();
+        return corsResponseBuilder(200, "Everything seems to have worked.");
     }
     /**
     * This method handles any actual requests.
@@ -112,16 +123,17 @@ public class ApplicationController {
     * @param auth (OPTIONAL) the HTTP authentication string used to access the LRS
     * @return a String containing either an Error Message or a JSON-style collection of the results to be displayed by the Frontend
     */
-    @CrossOrigin()
-    @GetMapping("/analysexapi")
-    public String analyseXAPI(
-            @RequestParam(name="key",required=true) String key,
-            @RequestParam(name="objectid",required=true) String objectID,
-            @RequestParam(name="actionid",required=true) String actionID,
-            @RequestParam(name="constraints",required=true) String constraints,
-            @RequestParam(name="url",required=false, defaultValue="EMPTYURL") String url, 
-            @RequestParam(name="auth",required=false, defaultValue="EMPTYAUTH") String auth,
-            @RequestParam(name="recommend",required=true) String recommend){
+    @GET
+    @Path("/analysexapi")
+    public Response analyseXAPI(
+            @DefaultValue("EMPTY") @QueryParam("key") String key,
+            @DefaultValue("EMPTY") @QueryParam("objectid") String objectID,
+            @DefaultValue("EMPTY") @QueryParam("actionid") String actionID,
+            @DefaultValue("EMPTY") @QueryParam("constraints") String constraints,
+            @DefaultValue("EMPTY") @QueryParam("url") String url,
+            @DefaultValue("EMPTY") @QueryParam("auth") String auth,
+            @DefaultValue("EMPTY") @QueryParam("recommend") String recommend){
+            
         System.out.println("External Component has made an xAPI analysation request.");
         System.out.println("url: "+url);
         System.out.println("auth: "+auth);
@@ -130,7 +142,7 @@ public class ApplicationController {
         
         // TODO:: handle error message in Frontend
         if(url.equals("EMPTYURL") || auth.equals("EMPTYAUTH"))
-            return "Insufficient Parameters";
+            return corsResponseBuilder(200, "Insufficient Parameters");
         
         // Split up constraints into separate Strings and use them to build a query for the LRS
         String[] separateConstraints = constraints.split(",");
@@ -152,18 +164,27 @@ public class ApplicationController {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("javascript");
         
-        Response response;
+        String response;
         
         List<String> values = new ArrayList<String>();
         
         do{
-            response = sendXAPIRequest(url, attachment, auth);
+            try {
+				response = sendXAPIRequest(url, attachment, auth);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return corsResponseBuilder(200, "sendXAPIRequest failed.");
+			}
+            System.out.println("Response: " + response);
             if(response == null)
                 break;
             try{
                 // JSON is turned into a Java Map using a Javascript call to avoid unnecessary dependancies.
-                String javascript = "Java.asJSONCompatible(" + response.body().string() + ")";
-                Map body = (Map) engine.eval(javascript);
+                String javascript = "Java.asJSONCompatible(" + response + ")";
+                Object evaluation = engine.eval(javascript);
+                if(!(evaluation instanceof Map))
+                	System.out.println("JSON could not be parsed");
+                Map body = (Map) evaluation;
             
                 System.out.println("more: " + body.get("more"));
                 
@@ -190,15 +211,15 @@ public class ApplicationController {
                 }
                 
                 attachment = body.get("more").toString();
-            }catch(IOException|ScriptException se){
+            }catch(ScriptException se){
                 System.out.println("JSON Parsing failed!");
-                return "JSON Parsing failed. This probably means the LRS could not be reached. Please check your connection.";
+                return corsResponseBuilder(200, "JSON Parsing failed. This probably means the LRS could not be reached. Please check your connection.");
             }
         }while(true);
         
         Result result = compileResults(values, key, actionID, objectID);
         System.out.println("received and updated results. returning JSON String...");
-        return result.toJSONString();
+        return corsResponseBuilder(200, result.toJSONString());
     }
     
     /**
@@ -209,23 +230,21 @@ public class ApplicationController {
     * @return the success state determined by the LRS or an error message.
     *
     */
-    @CrossOrigin()
-    @GetMapping("/xapitest")
+    @GET
+    @Path("/xapitest")
     public String xAPItest(){
     
-        Response response = this.sendXAPIRequest("http://localhost/data/xAPI/statements", "?since=2018-07-28T00:01:00.360Z",
-                "Basic MTZlODUyNzllYTQ5YzA5YTkzNGE2N2RhOWQzMjQ5M2Y1YTI1OTc5MjpjYWM3YTExYTJhY2E0N2Y2YjMxMDI4YjhkNjA3MTg4MjM2NTk0Y2Yy");
-	    String body = "uninitialized";
-	    try{
-	        body = response.body().string();
-	    }catch(Exception e){
-	        System.out.println("String of body could not be determined.");
-	    }
-	    try{
-	        return body;
-	    }catch(Exception e){
-	        return "Failed.";
-	    }
+        String response;
+		try {
+			response = this.sendXAPIRequest("http://localhost/data/xAPI/statements", "?since=2018-07-28T00:01:00.360Z",
+			        "Basic MTZlODUyNzllYTQ5YzA5YTkzNGE2N2RhOWQzMjQ5M2Y1YTI1OTc5MjpjYWM3YTExYTJhY2E0N2Y2YjMxMDI4YjhkNjA3MTg4MjM2NTk0Y2Yy");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "xAPI Test failed.";
+		}
+	    
+        return response;
     }
     
     /**
@@ -236,27 +255,44 @@ public class ApplicationController {
     * @param url the URL at which the used LRS is hosted
     * @param query the URL attachment specifying exactly where in the LRS which xAPI data should be returned
     * @param auth the authentication needed to access the LRS 
-    * @return an OkHTTP3.Response Object containing information on the HTTP Response by the LRS
+    * @return String containing information on the HTTP Response by the LRS
+     * @throws IOException 
     */
-    private Response sendXAPIRequest(String url, String query, String auth){
-        OkHttpClient client = new OkHttpClient();
-        System.out.println("Attempting to send xAPI request: "+query);
-        Request request = new Request.Builder()
-            .url(url+query)
-            .get()
-            .addHeader("X-Experience-API-Version", "1.0.3")
-            .addHeader("Authorization", auth)
-            .addHeader("Cache-Control", "no-cache")
-            .build();
-        try{
-            return client.newCall(request).execute();
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return null;
+    private String sendXAPIRequest(String url, String query, String auth) throws IOException{
+    	
+    	System.out.println("attempting to send request to LRS");
+    	
+    	URL urlObject = new URL(url+query);
+    	HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
+    	
+    	//add headers
+    	connection.setRequestMethod("GET");  // not necessary for GET requests
+    	connection.setRequestProperty("X-Experience-API-Version", "1.0.3");
+    	connection.setRequestProperty("Authorization", auth);
+    	connection.setRequestProperty("Cache-Control", "no-cache");
+    	
+    	int code = connection.getResponseCode();
+    	System.out.println("GET request sent to : " + url + query);
+    	System.out.println("with response code : " + code);
+    	
+    	BufferedReader reader = new BufferedReader( new InputStreamReader(connection.getInputStream()));
+    	String line;
+    	StringBuffer buffer = new StringBuffer();
+    	
+    	while((line = reader.readLine()) != null)
+    		buffer.append(line);
+    	
+    	reader.close();
+    	
+    	return buffer.toString();
     }
-    
-    /**
+	
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	
+	
+	/**
     * This is a helper method to simplify received statements into
     * the actual needed values.
     * Currently only String values are supported.
@@ -269,7 +305,7 @@ public class ApplicationController {
         List<String> result = new ArrayList<String>();
     
         for(Object statement : statements.values()){
-            Map stmtmap = (Map) statement;
+            Map<String, String> stmtmap = (Map<String, String>) statement;
             result.add((String) stmtmap.get(key));
         }
         
@@ -408,5 +444,12 @@ public class ApplicationController {
         System.out.println("Returning results");
         return res;
     }
-
+    
+    private Response corsResponseBuilder(int status, String entity) {
+    	
+    	return Response.status(status).entity(entity)
+    			.header("Access-Control-Allow-Origin", "*")
+    			.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS").build();
+    }
+    
 }

@@ -186,7 +186,7 @@ function appendDivWithBackendUI(elem){
     var backendField = document.createElement("INPUT");
     setAttributes(backendField,
             ["type", "text"],
-            ["placeholder", "http://localhost:9000"],
+            ["placeholder", "http://localhost:9003/OpenBadgeDesigner"],
             ["id", "backendfield"]);
     var backendFieldP = document.createElement("p");
         backendFieldP.appendChild(backendField);
