@@ -68,7 +68,7 @@ public class BadgeGenerator{
     
         Badge badge = new Badge();
         badge.setCriteria(String.format("Reach a total SUM of %s on the values of xAPI key %s for action %s on Object %s", newSum, key, actionID, objectID));
-        badge.setCriteriaMachineReadable(String.format("{object: %s, action: %s, key: %s, condition: \"SUM[value]>%s\", repetitions: 1}", objectID, actionID, key, newSum)); 
+        badge.setCriteriaMachineReadable(String.format("object: %s, action: %s, key: %s, condition: SUM[value]>%s, repetitions: 1", objectID, actionID, key, newSum)); 
         //with key X , the sum of all values must be greater than Y once
         badge.setNotes("This Badge is scaled by 3 * the total sum for all included users. This value may be much too large if data for all agents is used for a single user. Please adjust.");
         this.badges.add(badge);
@@ -104,12 +104,12 @@ public class BadgeGenerator{
         if(countable){   
             Badge badge = new Badge();
             badge.setCriteria(String.format("Do Action %s on Object %s with a value between %s and %s on xAPI key %s 3 times.", actionID, objectID, first_value, last_value, key));
-            badge.setCriteriaMachineReadable(String.format("{object: %s, action: %s, key: %s, condition: \"value<%s&value>%s\", repetitions: 3}", objectID, actionID, key, last_value, first_value));
+            badge.setCriteriaMachineReadable(String.format("object: %s, action: %s, key: %s, condition: value<%s&value>%s, repetitions: 3", objectID, actionID, key, last_value, first_value));
             this.badges.add(badge);
         }else{
             Badge badge = new Badge();
             badge.setCriteria(String.format("Do Action %s on Object %s with a value of %s on xAPI key %s 3 times.", actionID, objectID, first_value, key));
-            badge.setCriteriaMachineReadable(String.format("{object: %s, action: %s, key: %s, condition: \"value=%s\", repetitions: 3", objectID, actionID, key, first_value));
+            badge.setCriteriaMachineReadable(String.format("object: %s, action: %s, key: %s, condition: value=%s, repetitions: 3", objectID, actionID, key, first_value));
             this.badges.add(badge);
         }
     }
@@ -144,12 +144,12 @@ public class BadgeGenerator{
         if(countable){
             Badge badge = new Badge();
             badge.setCriteria(String.format("Do Action %s on Object %s with a value between %s and %s on xAPI key %s 3 times.", actionID, objectID, first_value, last_value, key));
-            badge.setCriteriaMachineReadable(String.format("{object: %s, action: %s, key: %s, condition: \"value<%s&value>%s\", repetitions: 3}", objectID, actionID, key, last_value, first_value));
+            badge.setCriteriaMachineReadable(String.format("object: %s, action: %s, key: %s, condition: value<%s&value>%s, repetitions: 3", objectID, actionID, key, last_value, first_value));
             this.badges.add(badge);
         }else{
             Badge badge = new Badge();
             badge.setCriteria(String.format("Do Action %s on Object %s with a value of %s on xAPI key %s 3 times.", actionID, objectID, first_value, key));
-            badge.setCriteriaMachineReadable(String.format("{object: %s, action: %s, key: %s, condition: \"value=%s\", repetitions: 3}", objectID, actionID, key, first_value));
+            badge.setCriteriaMachineReadable(String.format("object: %s, action: %s, key: %s, condition: value=%s, repetitions: 3", objectID, actionID, key, first_value));
             this.badges.add(badge);
         }
     }
@@ -186,7 +186,7 @@ public class BadgeGenerator{
            
         Badge badge = new Badge();
         badge.setCriteria(String.format("Do Action %s on Object %s with a value between %s and %s on xAPI key %s 3 times.", actionID, objectID, first_value, last_value, key));
-        badge.setCriteriaMachineReadable(String.format("{object: %s, action: %s, key: %s, condition: \"value<%s&value>%s\", repetitions: 3}", objectID, actionID, key, last_value, first_value));
+        badge.setCriteriaMachineReadable(String.format("object: %s, action: %s, key: %s, condition: value<%s&value>%s, repetitions: 3", objectID, actionID, key, last_value, first_value));
         this.badges.add(badge);
     }
     
@@ -222,7 +222,7 @@ public class BadgeGenerator{
         
         Badge badge = new Badge();
         badge.setCriteria(String.format("Do Action %s on Object %s with a value between %s and %s on xAPI key %s 3 times.", actionID, objectID, first_value, last_value, key));
-        badge.setCriteriaMachineReadable(String.format("{object: %s, action: %s, key: %s, condition: \"value<%s&value>%s\", repetitions: 3}", objectID, actionID, key, last_value, first_value));
+        badge.setCriteriaMachineReadable(String.format("object: %s, action: %s, key: %s, condition: value<%s&value>%s, repetitions: 3", objectID, actionID, key, last_value, first_value));
         this.badges.add(badge);
     }
 }

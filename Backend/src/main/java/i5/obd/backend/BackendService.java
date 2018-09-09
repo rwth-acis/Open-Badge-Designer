@@ -184,7 +184,8 @@ public class BackendService {
                 Object evaluation = engine.eval(javascript);
                 if(!(evaluation instanceof Map))
                 	System.out.println("JSON could not be parsed");
-                Map body = (Map) evaluation;
+                @SuppressWarnings("rawtypes") 
+				Map body = (Map) evaluation;
             
                 System.out.println("more: " + body.get("more"));
                 
@@ -193,15 +194,17 @@ public class BackendService {
                     and JSON Objects are handled as Objects which are essentially Maps, though not automatically
                     recognized (thus the casting).
                     
-                    To go deeper into the JSON of a statement (not necessary in this version) it may be helpful to 
+                    To go deeper into the JSON of a statement (not necessary in this version) it will be needed to 
                     adapt getValuesAtKeys() to proceed recursively and check for each Object whether it's a 
-                    JSON Object or a JSONListAdapter
+                    JSON Object or a JSONListAdapter or specify dedicated locations to check for (such as the
+                    extensions section of the results which can be part of a statement).
                 */
                 JSONListAdapter statements = (JSONListAdapter)body.get("statements");
                 if (key.equals("hour") || key.equals("day") || key.equals("month")){
                     values.addAll(getValuesAtKey(statements, "timestamp"));
                 }else{
                     values.addAll(getValuesAtKey(statements, key));
+                    // TODO:: Real statements only have limited data i
                 }
                 System.out.println(statements);
                 
@@ -435,6 +438,7 @@ public class BackendService {
         List<Badge> badges = gen.getBadges();
         
         for (Badge badge: badges){
+        	res.addBadge(badge);
             System.out.println(badge.getCriteriaMachineReadable());
         }
         

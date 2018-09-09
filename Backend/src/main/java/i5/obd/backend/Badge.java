@@ -105,6 +105,37 @@ public class Badge{
     public void setNotes(String notes){
         this.notes = notes;
     }
+
+    
+//    private String name;
+//    
+//    private String description;
+//    
+//    private String imageURI;
+//    
+//    private String criteriaURI;
+//    
+//    private String criteria;
+//    
+//    private String criteriaMachineReadable;
+//    
+//    private String issuer;
+//    
+//    private String notes;
+    
+	public String toJSONString() {
+		String out = "{";
+		out = out + "\"name\":\"" + name + "\",";
+		out = out + "\"description\":\"" + description + "\",";
+		out = out + "\"imageuri\":\"" + imageURI + "\",";
+		out = out + "\"criteriauri\":\"" + criteriaURI + "\",";
+		out = out + "\"criteria\":\"" + criteria + "\",";
+		out = out + "\"criteriamachinereadable\":\"" + criteriaMachineReadable + "\",";
+		out = out + "\"issuer\":\"" + issuer + "\",";
+		out = out + "\"notes\":\"" + notes + "\"";
+		out = out + "}";
+		return out;
+	}
     
     
 }
