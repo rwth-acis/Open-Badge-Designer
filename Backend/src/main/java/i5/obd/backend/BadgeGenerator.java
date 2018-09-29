@@ -30,7 +30,7 @@ public class BadgeGenerator{
         if (countable){
             // if the list contains countable integers, it should be sorted, as the numbers will lose their meaning out of order.
             Collections.sort(values, new CountablePairComparator());
-            // add Badge L (reach a sum of XXX values. This is meaningless for timestamps, but works out to "reach an alltime score of 10000" or "kill 5000 sheep")
+            // add Badge L (reach a sum of X values. This is meaningless for timestamps, but works out to "reach an alltime score of 10000" or "kill 5000 sheep")
             addSumBadge(values, key, actionID, objectID);
             /*
                 specifically for countable values, it may happen that a very large number of
@@ -56,7 +56,6 @@ public class BadgeGenerator{
         }
     }
     
-    //TODO:: a lot of this code is basically pseudocode. Get it to actually run later.
     private void addSumBadge(List<Pair> values, String key, String actionID, String objectID){
         int newSum = 0;
         for (Pair pair: values){
@@ -76,11 +75,11 @@ public class BadgeGenerator{
     
     private void addUncommonBadge(List<Pair> values, String key, String actionID, String objectID, boolean countable){
     // get values in least common range n times
-        int totalOccurrences = 0;
+        //int totalOccurrences = 0;
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
         for (Pair pair: values){
-            totalOccurrences += pair.getValueY();
+            //totalOccurrences += pair.getValueY();
             if(pair.getValueY() < min)
                 min = pair.getValueY();
             if(pair.getValueY() > max)
@@ -116,11 +115,11 @@ public class BadgeGenerator{
     
     private void addCommonBadge(List<Pair> values, String key, String actionID, String objectID, boolean countable){
     // get values in most common range n times
-        int totalOccurrences = 0;
+        //int totalOccurrences = 0;
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
         for (Pair pair: values){
-            totalOccurrences += pair.getValueY();
+            //totalOccurrences += pair.getValueY();
             if(pair.getValueY() < min)
                 min = pair.getValueY();
             if(pair.getValueY() > max)
@@ -156,12 +155,12 @@ public class BadgeGenerator{
     
     private void addHighBadge(List<Pair> values, String key, String actionID, String objectID){
     // get values above X n times. (increase occur of highest values)
-        int totalSum = 0;
+        //int totalSum = 0;
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
         for (Pair pair: values){
             int val_x = Integer.parseInt(pair.getValueX());
-            totalSum += val_x;
+            //totalSum += val_x;
             if(val_x < min)
                 min = val_x;
             if(val_x > max)
@@ -192,12 +191,12 @@ public class BadgeGenerator{
     
     private void addLowBadge(List<Pair> values, String key, String actionID, String objectID){
     // get values below X n times (increase occur of lowest values)
-        int totalSum = 0;
+        //int totalSum = 0;
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
         for (Pair pair: values){
             int val_x = Integer.parseInt(pair.getValueX());
-            totalSum += val_x;
+            //totalSum += val_x;
             if(val_x < min)
                 min = val_x;
             if(val_x > max)

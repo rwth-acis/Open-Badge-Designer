@@ -3,7 +3,6 @@ package i5.obd.backend;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import javax.net.ssl.HttpsURLConnection;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -98,7 +97,6 @@ public class BackendService {
 			response = sendXAPIRequest(url, "/data/xAPI/statements"+"?since=2018-07-28T00:01:00.360Z&limit=2", auth);
 			System.out.println("response received, attempting to return.");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println("sendXAPIRequest failed.");
 			return corsResponseBuilder(200, "sendXAPIRequest failed.");
@@ -108,6 +106,8 @@ public class BackendService {
         
         return corsResponseBuilder(200, "Everything seems to have worked.");
     }
+    
+    
     /**
     * This method handles any actual requests.
     * It is used to retrieve xAPI statements fitting the query and
@@ -156,7 +156,7 @@ public class BackendService {
             }
         }
         
-        // add path to statements to attachment
+        // add statements path to attachment
         attachment = "/data/xAPI/statements" + attachment;
         
         System.out.println("attachment: "+attachment);
@@ -184,27 +184,33 @@ public class BackendService {
                 Object evaluation = engine.eval(javascript);
                 if(!(evaluation instanceof Map))
                 	System.out.println("JSON could not be parsed");
+                // On proper use, the evaluation should ALWAYS return a Map.
                 @SuppressWarnings("rawtypes") 
 				Map body = (Map) evaluation;
             
                 System.out.println("more: " + body.get("more"));
                 
-                /*
-                    The parsed JSON turns into a format where Lists are handled as JSONListAdapter Objects
-                    and JSON Objects are handled as Objects which are essentially Maps, though not automatically
-                    recognized (thus the casting).
-                    
-                    To go deeper into the JSON of a statement (not necessary in this version) it will be needed to 
-                    adapt getValuesAtKeys() to proceed recursively and check for each Object whether it's a 
-                    JSON Object or a JSONListAdapter or specify dedicated locations to check for (such as the
-                    extensions section of the results which can be part of a statement).
+                /* 
+                 * 
+                 *   The parsed JSON turns into a format where Lists are handled as JSONListAdapter Objects
+                 *   and JSON Objects are handled as Objects which are essentially Maps, though not automatically
+                 *   recognized (thus the casting).
+                 *   
+                 *   To go deeper into the JSON of a statement (not necessary in this version) it will be needed to 
+                 *   adapt getValuesAtKeys() to proceed recursively and check for each Object whether it's a 
+                 *   JSON Object or a JSONListAdapter or specify dedicated locations to check for (such as the
+                 *   extensions section of the results which can be part of a statement).
                 */
                 JSONListAdapter statements = (JSONListAdapter)body.get("statements");
                 if (key.equals("hour") || key.equals("day") || key.equals("month")){
                     values.addAll(getValuesAtKey(statements, "timestamp"));
                 }else{
                     values.addAll(getValuesAtKey(statements, key));
-                    // TODO:: Real statements only have limited data i
+                    /* TODO:: Real statements only have limited data at the surface level JSON.
+                     * 
+                     * This should in future check for more cases (presets for score, etc) 
+                     * and custom xAPI extensions as well.
+                     */
                 }
                 System.out.println(statements);
                 
@@ -242,7 +248,6 @@ public class BackendService {
 			response = this.sendXAPIRequest("http://localhost/data/xAPI/statements", "?since=2018-07-28T00:01:00.360Z",
 			        "Basic MTZlODUyNzllYTQ5YzA5YTkzNGE2N2RhOWQzMjQ5M2Y1YTI1OTc5MjpjYWM3YTExYTJhY2E0N2Y2YjMxMDI4YjhkNjA3MTg4MjM2NTk0Y2Yy");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return "xAPI Test failed.";
 		}
@@ -268,13 +273,15 @@ public class BackendService {
     	URL urlObject = new URL(url+query);
     	HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
     	
-    	//add headers
-    	connection.setRequestMethod("GET");  // not necessary for GET requests
+    	// transmit headers
+    	connection.setRequestMethod("GET");  // probably not necessary for GET requests as it is the default(?)
     	connection.setRequestProperty("X-Experience-API-Version", "1.0.3");
     	connection.setRequestProperty("Authorization", auth);
     	connection.setRequestProperty("Cache-Control", "no-cache");
     	
+    	// receive and compute the response
     	int code = connection.getResponseCode();
+    	
     	System.out.println("GET request sent to : " + url + query);
     	System.out.println("with response code : " + code);
     	
@@ -286,6 +293,9 @@ public class BackendService {
     		buffer.append(line);
     	
     	reader.close();
+    	
+    	// this works fine without the disconnect, but may interfere with GC(?)
+    	connection.disconnect();
     	
     	return buffer.toString();
     }
@@ -308,7 +318,15 @@ public class BackendService {
         List<String> result = new ArrayList<String>();
     
         for(Object statement : statements.values()){
-            Map<String, String> stmtmap = (Map<String, String>) statement;
+        	/*
+        	 * TODO:: Custom warning if maps are not <String, String>
+        	 * 
+        	 * Since This is only intended to be used with a JSON representation of statement fields
+        	 * where each one contains a String. If used incorrectly (such as trying to access a statement
+        	 * field which contains a sub-object or array), it won't work yet.
+        	 */
+            @SuppressWarnings("unchecked") 
+			Map<String, String> stmtmap = (Map<String, String>) statement;
             result.add((String) stmtmap.get(key));
         }
         
@@ -345,7 +363,7 @@ public class BackendService {
         }
         
         // switch applies presets for custom values.
-        // TODO:: handle incorrect timestamp format if this is possible to occur
+        // TODO:: handle incorrect timestamp format IF this is possible to occur
         System.out.println("key right before switch: " + key);
         if(key.equals("timestamp")){
             System.out.println("Key 'timestamp' replaced with 'hour'");

@@ -20,6 +20,9 @@ var object;
 var action;
 var constraints;
 
+var badgesDiv;
+var badgeRecommendations = [];
+
 $(document).ready(function(){
     // check location within HTML page to start adding elements
     UIDiv = document.getElementById("frontendUI");
@@ -91,6 +94,7 @@ function constructAssistedBadgeMode(){
     appendDivWithSourceUI(leftDiv);
     appendDivWithDeclarationsUI(leftDiv);
     appendDivWithAnalyticsUI(rightDiv, "canvas1");
+    appendDivForBadgeRecommendations(rightDiv);
     
 }
 
@@ -365,7 +369,7 @@ function appendDivWithDeclarationsUI(elem){
 
 function appendDivWithAnalyticsUI(elem, canvasName){
     var analyticsDiv = document.createElement("DIV");
-    analyticsDiv.style.backgroundColor = 'lightgreen';
+        analyticsDiv.style.backgroundColor = 'lightgreen';
     
     var text = document.createTextNode("Analytics go here. Enter declarations and hit the Analyse button to get results.");
     var textP = document.createElement("p");
@@ -380,44 +384,55 @@ function appendDivWithAnalyticsUI(elem, canvasName){
     
     appendChildren(analyticsDiv, textP, canvasP);
     
-    elem.append(analyticsDiv);
+    elem.appendChild(analyticsDiv);
 }
-/* TODO:: Remove this.
-    The UI could alternatively be made directly as part of HTML with CSS styling.
-    The constructUI() function is simply there to make it easier to add this frontend
-    to any existing page without major changes. All that's needed is a div tag with
-    the 'frontendUI' ID as seen in the index.html used to launch this during development.
+
+function appendDivForBadgeRecommendations(elem){
+    var badgesDiv = document.createElement("DIV");
+        badgesDiv.style.backgroundColor = 'lightblue';
+        badgesDiv.id = "badgesdiv";
+    var text = document.createTextNode("Badge Recommendations go here.");
+    var textP = document.createElement("p");
+        textP.appendChild(text);
+        badgesDiv.appendChild(textP);
+    
+    elem.appendChild(badgesDiv);
+}
+
+/*
+"badges":[{
+    "name":"A new Badge",
+    "description":"Earned by fulfilling the criteria!",
+    "imageuri":"http://example.com/badges/a-new-badge.png",
+    "criteriauri":"http://example.com/badges/a-new-badge-criteria.html",
+    "criteria":"Reach a total SUM of 10413 on the values of xAPI key hour for action http://example.com/verbs/someEpicVerb on Object http://example.com/activities/someAmazingObject",
+    "criteriamachinereadable":"
+        object: http://example.com/activities/someAmazingObject, 
+        action: http://example.com/verbs/someEpicVerb, 
+        key: hour, 
+        condition: SUM[value]>10413, 
+        repetitions: 1",
+    "issuer":"http://example.com/issuers/YOURNAME.json",
+    "notes":"This Badge is scaled by 3 * the total sum for all included users. 
+            This value may be much too large if data for all agents is used for a single user. 
+            Please adjust."
+    }
 */
-function constructUI(){
+
+function appendDivWithBadgeRecommendation(elem, badgeData){
+    var badge = {};
     
-    var recommendations = document.createElement("DIV");
-    var badgesurvey = document.createElement("DIV");
+    badge["DIV"] = document.createElement("DIV");
+    badge["DIV"].style.backgroundColor = 'lightgreen';
     
+    badge["name"] = badgeData["name"];
+    //...
     
-    recommendations.style.backgroundColor = 'lightsteelblue';
-    badgesurvey.style.backgroundColor = 'lightyellow';
+    var nameTextP = document.createElement("p");
+        nameTextP.appendChild(document.createTextNode(badge["name"]));
+    badge["DIV"].appendChild(nameTextP);
     
-    // prepare paragraphs
-    
-    
-    
-    
-    
-    // assign paragraphs to divisions
-    appendChildren(left, declarations, badgesurvey);
-    
-    
-    
-    
-    // add a section to hold a badge design survey
-    
-    // add a section to display analytics
-    
-    // add a section to display badge recommendations
-    
-    
-    analyticstextlocation.appendChild(analyticstext);
-    analyticscanvaslocation.appendChild(analyticscanvas);
+    elem.appendChild(badge["DIV"]);
 }
 
 // append several children at once
@@ -568,7 +583,7 @@ function analyseXAPI(){
         }
         console.log(labels);
         console.log(values);
-        
+        //TODO:: make separate function for charts! Also delete existing charts when generating new ones...
         var canvas = document.getElementById("canvas1");
         var chart = new Chart(canvas,
             {   
@@ -600,6 +615,12 @@ function analyseXAPI(){
                 }
             }
         );
+        
+        if(!twoFields){
+            results.badges.forEach(function(element) {
+                appendDivWithBadgeRecommendation(document.getElementById("badgesdiv"),element);
+            });
+        }
     }).fail(function(xhr, status, error){
         alert("Error: please check if a backend instance is running at the specified location.");
     });
@@ -659,6 +680,5 @@ function analyseXAPI(){
             alert("Error: please check if a backend instance is running at the specified location.");
         });
     }
-    
 }
 
