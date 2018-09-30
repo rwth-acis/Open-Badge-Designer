@@ -20,6 +20,8 @@ var object;
 var action;
 var constraints;
 
+var chart1 = null;
+var chart2 = null;
 var badgesDiv;
 var badgeRecommendations = [];
 
@@ -105,6 +107,8 @@ function constructManualBadgeMode(){
     removeAllChildren(UIDiv);
     
     appendPWithReturnButton(UIDiv);
+	
+	appendDivWithBadgeUI(UIDiv);
 }
 
 /*
@@ -435,6 +439,43 @@ function appendDivWithBadgeRecommendation(elem, badgeData){
     elem.appendChild(badge["DIV"]);
 }
 
+function appendDivWithBadgeUI(elem){
+	var badgeDiv = document.createElement("DIV");
+	badgeDiv.style.border = '2px solid black';
+	
+	var bText = document.createTextNode("Open Badge Survey: If recommendations are used, applying a recommendation will overwrite some of the fields in this survey!");
+	var textP = document.createElement("p");
+		textP.appendChild(bText);
+	
+	var badgeFileDiv = document.createElement("DIV");
+	var badgeFileText = document.createTextNode("Select a badge image from your file system to upload.");
+	var badgeFileTextP = document.createElement("p");
+		badgeFileTextP.appendChild(badgeFileText);
+	var badgeFileInput = document.createElement("INPUT");
+	var badgeFileInputP = document.createElement("p");
+		badgeFileInputP.appendChild(badgeFileInput);
+	setAttributes(badgeFileInput,
+			["id", "badgefileinput"],
+			["type", "file"],
+			["name", "badgefilecontent"]);
+			
+	
+	var submitButton = document.createElement("BUTTON");
+        submitButton.appendChild(document.createTextNode("Test"));
+        submitButton.onclick = uploadBadgeDataToFileservice;
+        submitButton.style.width = '223px'
+    var submitButtonP = document.createElement("p");
+        submitButtonP.appendChild(submitButton);
+	
+	
+	appendChildren(badgeFileDiv, badgeFileTextP, badgeFileInputP);
+	
+	appendChildren(badgeDiv, textP, badgeFileDiv, submitButtonP);
+	
+	elem.append(badgeDiv);
+}
+
+
 // append several children at once
 function appendChildren(elem /*children can be passed here */){
     for (var i=1; i<arguments.length; i+=1){
@@ -460,6 +501,74 @@ function setAttributes(elem /*[attribute, value] pairs can be passed here*/){
 function compareKeys(a, b){
     return a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0;
 }
+
+//TODO:: Finish implementation of upload function
+function uploadBadgeDataToFileservice(){	
+	var imageInput = document.getElementById("badgefileinput");
+	
+	var imageForm = new FormData();
+	var classForm = new FormData();
+	// var issuerForm = new FormData();
+	
+	imageForm.append("filecontent", imageInput.files[0]);
+	imageForm.append("identifier", "testimageidentifier");
+	imageForm.append("sharewithgroup", "");
+	imageForm.append("excludefromindex", false);
+	imageForm.append("description", "testdescription");
+
+	var testClassJSON = {
+		"key1" : 1,
+		"key2" : "value2",
+		"key3" : ["a","b"]
+	};
+	
+	console.log(JSON.stringify(testClassJSON, null, 4));
+	console.log(JSON.stringify(testClassJSON, null, 4).split('\n'));
+	
+	var classFile = new File(
+			[JSON.stringify(testClassJSON, null, 4)],
+			"testbadgeclass.json",
+			{type: "text/plain"});
+	
+	classForm.append("filecontent", classFile);
+	classForm.append("identifier", "testclassidentifier");
+	classForm.append("sharewithgroup", "");
+	classForm.append("excludefromindex", false);
+	classForm.append("description", "testdescription");
+	
+	sendFormDataToFileService(imageForm);
+	sendFormDataToFileService(classForm);
+	
+}
+
+
+function sendFormDataToFileService(formData){
+	$.ajax({
+		url: "https://las2peer.dbis.rwth-aachen.de:9098/fileservice/files",
+		type: "POST",
+		data: formData,
+		mimeTypes: "multipart/form-data",
+		contentType: false,
+		cache: false,
+		processData: false,
+		beforeSend: function(xhr) {
+			xhr.setRequestHeader("access_token", window.localStorage["access_token"]);
+			//xhr.setRequestHeader("oidc_provider", window.localStorage["oidc_provider"]);
+			xhr.setRequestHeader("accept", "text/plain");
+		},
+		success: function(data, textStatus){
+			console.log("file submitted");
+			console.log(textStatus);
+			console.log(data);
+		},
+		error: function(jqxhr, status, error){
+			console.log(jqxhr);
+			console.log(status);
+			console.log(error);
+		}
+	});
+}
+
 
 function setConnection(){
     
@@ -550,6 +659,7 @@ function setDeclarations(){
     }
 }
 
+//TODO:: split of chart creation into separate function
 function analyseXAPI(){
     
     setDeclarations();
@@ -585,7 +695,12 @@ function analyseXAPI(){
         console.log(values);
         //TODO:: make separate function for charts! Also delete existing charts when generating new ones...
         var canvas = document.getElementById("canvas1");
-        var chart = new Chart(canvas,
+		
+		if(chart1 != null){
+			chart1.destroy();
+		}
+		
+        chart1 = new Chart(canvas,
             {   
                 type: 'bar',
                 data: {
@@ -645,7 +760,12 @@ function analyseXAPI(){
             console.log(values);
             
             var canvas = document.getElementById("canvas2");
-            var chart = new Chart(canvas,
+            
+			if(chart2 != null){
+				chart2.destroy();
+			}
+			
+			chart2 = new Chart(canvas,
                 {   
                     type: 'bar',
                     data: {

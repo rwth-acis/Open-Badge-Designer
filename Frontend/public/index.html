@@ -3,14 +3,67 @@
     <head>
         <meta charset="UTF-8">
         <title>Open Badge Designer</title>
-        <script src="file:///home/daniel/Desktop/jquery-3.3.1.min.js"></script>
-        <script src="file:///home/daniel/Desktop/Chart.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
 	<script src="frontend.js"></script>
     </head>
     <body>
-	<div id="frontendUI" style="overflow:auto; height:100vh;">
-	</div>
-    </body>
+		<!--The oidc div is only required for interaction with las2peer systems. 
+			It can be removed if saving Badges on the las2peer FileService or 
+			interacting with the Gamification-Framework is not wished. -->
+		<!-- Generate OIDC Button -->
+		<div class="oidc">
+			<p>
+				<span class="oidc-signin"
+					data-callback="signinCallback"
+					data-name="Learning Layers"
+					data-logo="logo.png"
+					data-server="https://api.learning-layers.eu/o/oauth2"
+					data-clientid="c886dd05-fe0d-4dad-ac05-d619081a554a"
+					data-scope="openid email profile">
+				</span> 
+			</p>
+		</div>
+		
+		<!-- This part is necessary for the UI to be built by the frontend.js -->
+		<div id="frontendUI" style="overflow:auto; height:100vh;"></div>
+		
+		
+		
+		<!-- This part is needed for OIDC again and can be removed if this function is not required. -->
+		<!-- Add signinCallback function -->
+		<script type="text/javascript">
+			function signinCallback(result) {
+				if(result === "success"){
+					console.log("server: " + oidc_server);
+					window.localStorage["oidc_provider"] = oidc_server;
+					console.log("name: " + oidc_name);
+					console.log("id: " + oidc_clientid);
+					console.log("idtoken: " + oidc_idtoken);
+					console.log("access_token: " + window.localStorage["access_token"]);
+					//usedForm = document.getElementById('formContent');
+					//usedForm.setAttribute("access_token", window.localStorage["access_token"]);
+				} else {
+					// if sign in was not successful, log the cause of the error on the console
+					console.log(result);
+				}
+			}
+		</script>
+		
+		<!-- This part is needed for OIDC again and can be removed if this function is not required. -->
+		<!-- load in oidc script -->
+		<script type="text/javascript">
+			(function() {
+				var po = document.createElement('script'); 
+				po.type = 'text/javascript'; 
+				po.async = true;
+				po.src = './js/oidc-button.js';
+				var s = document.getElementsByTagName('script')[0]; 
+				s.parentNode.insertBefore(po, s);
+			})();
+		</script>
+		
+	</body>
 </html>
 
 
