@@ -42,6 +42,9 @@ function constructMainMenu(){
     var titleText = document.createTextNode("Open Badge Designer");
     var titleTextP = document.createElement("p");
         titleTextP.appendChild(titleText);
+	var subtitleText = document.createTextNode("Warning: Please Sign In with Learning Layers at the start if you require access to las2peer services. Login at a later point may lead to loss of data.")
+	var subtitleTextP = document.createElement("p");
+		subtitleTextP.appendChild(subtitleText);
     
     var assistedBadgeButton = document.createElement("BUTTON");
         assistedBadgeButton.appendChild(document.createTextNode("Assisted Badge Design Mode"));
@@ -64,7 +67,7 @@ function constructMainMenu(){
     var compareButtonP = document.createElement("p");
         compareButtonP.appendChild(compareButton);
         
-    appendChildren(UIDiv, titleTextP, assistedBadgeButtonP, manualBadgeButtonP, compareButtonP);
+    appendChildren(UIDiv, titleTextP, subtitleTextP, assistedBadgeButtonP, manualBadgeButtonP, compareButtonP);
 }
 
 /*
@@ -446,9 +449,10 @@ function appendDivWithBadgeUI(elem){
 	var bText = document.createTextNode("Open Badge Survey: If recommendations are used, applying a recommendation will overwrite some of the fields in this survey!");
 	var textP = document.createElement("p");
 		textP.appendChild(bText);
-	
+	var generalHR = document.createElement("HR");
+		
 	var badgeFileDiv = document.createElement("DIV");
-	var badgeFileText = document.createTextNode("If you wish to upload the Badge directly to the las2peer FileService, select a badge image from your file system to upload.");
+	var badgeFileText = document.createTextNode("You can either upload a .PNG image file directly to the FileService, or enter the URL to an existing one below. The image should be a square PNG with minimum dimensions of 90px and a maximum filesize of 256kb");
 	var badgeFileTextP = document.createElement("p");
 		badgeFileTextP.appendChild(badgeFileText);
 	var badgeFileInput = document.createElement("INPUT");
@@ -457,12 +461,77 @@ function appendDivWithBadgeUI(elem){
 			["type", "file"],
 			["name", "badgefilecontent"]);
 	var badgeFileButton = document.createElement("BUTTON");
-		badgeFileButton.appendChild(document.createTextNode("Upload to FileService"));
+		badgeFileButton.appendChild(document.createTextNode("Store Image on FileService"));
         badgeFileButton.onclick = uploadBadgeImageToFileService;
         badgeFileButton.style.width = '223px'
 	var badgeFileInputP = document.createElement("p");
 	appendChildren(badgeFileInputP, badgeFileInput, badgeFileButton);
-		
+	var badgeFileHR = document.createElement("HR");
+	
+	var badgeCriteriaText = document.createTextNode("You can either upload criteria directly to the FileService, or enter the URL to an existing .html describing the badge criteria below.");
+	var badgeCriteriaField = document.createElement("TEXTAREA");
+	setAttributes(badgeCriteriaField,
+			["rows", "5"],
+			["cols", "60"],
+			["id", "badgecriteria"],
+			["placeholder","Assisted Badge Mode allows to generate recommendations."]);
+	var badgeCriteriaButton = document.createElement("BUTTON");
+		badgeCriteriaButton.appendChild(document.createTextNode("Store Criteria on FileService"));
+        badgeCriteriaButton.onclick = uploadCriteriaToFileService;
+        badgeCriteriaButton.style.width = '223px'
+	var badgeCriteriaButtonDL = document.createElement("BUTTON");
+		badgeCriteriaButtonDL.appendChild(document.createTextNode("Download Criteria"));
+		badgeCriteriaButtonDL.onclick = downloadCriteria;
+	var badgeCriteriaButtonP = document.createElement("P");
+	appendChildren(badgeCriteriaButtonP, badgeCriteriaButton, badgeCriteriaButtonDL);
+	var badgeCriteriaP = document.createElement("p");
+	appendChildren(badgeCriteriaP, badgeCriteriaField);
+	var badgeCriteriaHR = document.createElement("HR");
+	
+	var badgeCriteriaMRText = document.createTextNode("Criteria in a machine-readable format: ");
+	var badgeCriteriaMRField = document.createElement("TEXTAREA");
+	setAttributes(badgeCriteriaMRField,
+			["rows", "5"],
+			["cols", "60"],
+			["id", "badgecriteriamr"],
+			["placeholder","For manual external implementation you may leave this empty. For use with the Gamification-Framework, use of Recommendations in Assisted Mode is advised."]);
+	var badgeCriteriaMRP = document.createElement("p");
+	appendChildren(badgeCriteriaMRP, badgeCriteriaMRField);
+	
+	var issuerText = document.createTextNode("If you have never created an Open Badge before, you can store issuer metadata on the FileService here or add a link to a self-hosted issuer file below.");
+	var issuerNameText = document.createTextNode("Issuer Name:");
+	var issuerNameTextP = document.createElement("p");
+		issuerNameTextP.appendChild(issuerNameText);
+	var issuerNameField = document.createElement("INPUT");
+	setAttributes(issuerNameField,
+			["id", "issuername"],
+			["type", "text"],
+			["placeholder", "max mustermann"]);
+	var issuerNameP = document.createElement("p");
+	appendChildren(issuerNameP, issuerNameField);
+	
+	var issuerWebText = document.createTextNode("Issuer Website:");
+	var issuerWebTextP = document.createElement("p");
+		issuerWebTextP.appendChild(issuerWebText);
+	var issuerWebField = document.createElement("INPUT");
+	setAttributes(issuerWebField,
+			["id", "issuerweb"],
+			["type", "text"],
+			["placeholder", "http://example.com/badges"]);
+	var issuerWebP = document.createElement("p");
+	appendChildren(issuerWebP, issuerWebField);
+	
+	var issuerButton = document.createElement("BUTTON");
+		issuerButton.appendChild(document.createTextNode("Store Issuer JSON on FileService"));
+		issuerButton.onclick = uploadIssuerDataToFileService;
+		issuerButton.style.width = '223px';
+	var issuerButtonDL = document.createElement("BUTTON");
+		issuerButtonDL.appendChild(document.createTextNode("Download Issuer JSON"));
+		issuerButtonDL.onclick = downloadIssuerData;
+	var issuerButtonP = document.createElement("P");
+	appendChildren(issuerButtonP, issuerButton, issuerButtonDL);
+	var issuerHR = document.createElement("HR");
+	
 	
 	var badgeNameText = document.createTextNode("Badge Name: ");
 	var badgeNameField = document.createElement("INPUT");
@@ -471,7 +540,7 @@ function appendDivWithBadgeUI(elem){
 			["type", "text"],
 			["placeholder", "A new Badge"]);
 	var badgeNameP = document.createElement("p");
-	appendChildren(badgeNameP, badgeNameText, badgeNameField);
+	appendChildren(badgeNameP, badgeNameField);
 	
 	var badgeDescriptionText = document.createTextNode("Badge Description: ");
 	var badgeDescriptionField = document.createElement("TEXTAREA");
@@ -481,78 +550,58 @@ function appendDivWithBadgeUI(elem){
 			["id", "badgedescription"],
 			["placeholder", "Earned by fulfilling the criteria!"]);
 	var badgeDescriptionP = document.createElement("p");
-	appendChildren(badgeDescriptionP, badgeDescriptionText, badgeDescriptionField);
+	appendChildren(badgeDescriptionP, badgeDescriptionField);
 	
-	var badgeCriteriaText = document.createTextNode("Criteria for earning the Badge: ");
-	var badgeCriteriaField = document.createElement("TEXTAREA");
-	setAttributes(badgeCriteriaField,
-			["rows", "5"],
-			["cols", "60"],
-			["id", "badgecriteria"],
-			["placeholder","Assisted Badge Mode allows to generate recommendations."]);
-	var badgeCriteriaButton = document.createElement("BUTTON");
-		badgeCriteriaButton.appendChild(document.createTextNode("Upload to FileService"));
-        badgeCriteriaButton.onclick = uploadCriteriaToFileService;
-        badgeCriteriaButton.style.width = '223px'
-	
-	
-	var badgeCriteriaP = document.createElement("p");
-	appendChildren(badgeCriteriaP, badgeCriteriaText, badgeCriteriaField, badgeCriteriaButton);
+	var badgeImageURIText = document.createTextNode("URI for Badge Image: ");
+	var badgeImageURIField = document.createElement("INPUT");
+	setAttributes(badgeImageURIField,
+			["id", "badgeimageuri"],
+			["type", "text"],
+			["placeholder", "http://example.com/badges/image_a_new_badge.png"]);
+	var badgeImageURIP = document.createElement("p");
+	appendChildren(badgeImageURIP, badgeImageURIField);
 	
 	var badgeCriteriaURIText = document.createTextNode("URI for Badge Criteria: ");
 	var badgeCriteriaURIField = document.createElement("INPUT");
 	setAttributes(badgeCriteriaURIField,
 			["id", "badgecriteriauri"],
 			["type", "text"],
-			["placeholder", "http://example.com/badges/a-new-badge-criteria"]);
+			["placeholder", "http://example.com/badges/criteria_a_new_badge.html"]);
 	var badgeCriteriaURIP = document.createElement("p");
-	appendChildren(badgeCriteriaURIP, badgeCriteriaURIText, badgeCriteriaURIField);
+	appendChildren(badgeCriteriaURIP, badgeCriteriaURIField);
 	
-	var badgeCriteriaMRText = document.createTextNode("Criteria in a machine-readable format: ");
-	var badgeCriteriaMRField = document.createElement("TEXTAREA");
-	setAttributes(badgeCriteriaMRField,
-			["rows", "5"],
-			["cols", "60"],
-			["id", "badgecriteriamr"],
-			["placeholder","For manual implementation outside you may leave this empty. For use with the Gamification-Framework, use of Recommendations in Assisted Mode are advised."]);
-	var badgeCriteriaMRP = document.createElement("p");
-	appendChildren(badgeCriteriaMRP, badgeCriteriaMRText, badgeCriteriaMRField);
-	
-	var issuerText = document.createTextNode("If you have never issued an Open Badge before, you should host an issuer file or generate one here: ")
-	var issuerNameText = document.createTextNode("Issuer Name:");
-	var issuerNameField = document.createElement("INPUT");
-	setAttributes(issuerNameField,
-			["id", "issuername"],
+	var issuerURIText = document.createTextNode("URI for Issuer Data: ");
+	var issuerURIField = document.createElement("INPUT");
+	setAttributes(issuerURIField,
+			["id", "issueruri"],
 			["type", "text"],
-			["placeholder", "max mustermann"]);
-	var issuerNameP = document.createElement("p");
-	appendChildren(issuerNameP, issuerNameText, issuerNameField);
-	
-	var issuerURLText = document.createTextNode("Issuer URL:");
-	var issuerURLField = document.createElement("INPUT");
-	setAttributes(issuerURLField,
-			["id", "issuerurl"],
-			["type", "text"],
-			["placeholder", "http://example.com/badges"]);
-	var issuerURLP = document.createElement("p");
-	appendChildren(issuerURLP, issuerURLText, issuerURLField);
-	
-	var issuerButton = document.createElement("BUTTON");
-		issuerButton.appendChild(document.createTextNode("Upload to FileService"));
-		issuerButton.onclick = uploadIssuerDataToFileService;
-		issuerButton.style.width = '223px';
+			["placeholder", "http://example.com/badges/issuer_max_mustermann.json"]);
+	var issuerURIFieldP = document.createElement("P");
+		issuerURIFieldP.appendChild(issuerURIField);
 		
+	
+	var classButton = document.createElement("BUTTON");
+		classButton.appendChild(document.createTextNode("Store Badge Class on FileService"));
+		classButton.onclick = uploadBadgeClassToFileservice;
+		classButton.style.width = '223px';
+	var classButtonDL = document.createElement("BUTTON");
+		classButtonDL.appendChild(document.createTextNode("Download Badge Class"));
+		classButtonDL.onclick = downloadBadgeClass;
+	var classButtonP = document.createElement("P");
+	appendChildren(classButtonP, classButton, classButtonDL);
+		
+	/*
 	var submitButton = document.createElement("BUTTON");
         submitButton.appendChild(document.createTextNode("SUBMIT"));
         submitButton.onclick = uploadBadgeDataToFileservice;
         submitButton.style.width = '223px';
     var submitButtonP = document.createElement("p");
         submitButtonP.appendChild(submitButton);
-		submitButtonP.appendChild(document.createTextNode(" to las2peer FileService. (You must be logged into OIDC for this!)"));
+		submitButtonP.appendChild(document.createTextNode(" to las2peer FileService. (You must be logged into OIDC for this!)"));*/
 	
 	appendChildren(badgeFileDiv, badgeFileTextP, badgeFileInputP);
 	
-	appendChildren(badgeDiv, textP, badgeFileDiv, badgeNameP, badgeDescriptionP, badgeCriteriaP, badgeCriteriaMRP, badgeCriteriaURIP, issuerText, issuerNameP, issuerURLP, issuerButton, submitButtonP);
+	appendChildren(badgeDiv, textP, generalHR, issuerText, issuerNameTextP, issuerNameP, issuerWebTextP, issuerWebP, issuerButtonP, issuerHR, badgeFileDiv, badgeFileHR, badgeCriteriaText, badgeCriteriaP, badgeCriteriaButtonP, badgeCriteriaHR, badgeNameText, badgeNameP, badgeDescriptionText, badgeDescriptionP, badgeCriteriaMRText, badgeCriteriaMRP, badgeImageURIText, badgeImageURIP, badgeCriteriaURIText, badgeCriteriaURIP, issuerURIText, issuerURIFieldP, classButtonP);
 	
 	elem.append(badgeDiv);
 }
@@ -585,44 +634,52 @@ function compareKeys(a, b){
 }
 
 //TODO:: Finish implementation of upload function
-function uploadBadgeDataToFileservice(){	
-	var imageInput = document.getElementById("badgefileinput");
+function uploadBadgeClassToFileservice(){
+	var nameField = document.getElementById("badgename"); // string
+	var descField = document.getElementById("badgedescription"); // string
+	var crMRField = document.getElementById("badgecriteriamr"); // + string
+	var imagField = document.getElementById("badgeimageuri");  // url png
+	var critField = document.getElementById("badgecriteriauri");   // url html
+	var issuField = document.getElementById("issueruri");  // url json
 	
-	var imageForm = new FormData();
-	var classForm = new FormData();
-	// var issuerForm = new FormData();
+	var jsonBadge = {
+		"name": nameField.value,
+		"description": descField.value + " ###MACHINE_READABLE###" + crMRField.value,
+		"image": imagField.value,
+		"criteria": critField.value,
+		"issuer": issuField.value
+	}
 	
-	imageForm.append("filecontent", imageInput.files[0]);
-	imageForm.append("identifier", "testimageidentifier");
-	imageForm.append("sharewithgroup", "");
-	imageForm.append("excludefromindex", false);
-	imageForm.append("description", "testdescription");
-
-	var testClassJSON = {
-		"key1" : 1,
-		"key2" : "value2",
-		"key3" : ["a","b"]
-	};
+	var classForm = constructFormDataFromText(JSON.stringify(jsonBadge, null, 4), "badge_class_"+nameField.value, ".json");
 	
-	console.log(JSON.stringify(testClassJSON, null, 4));
-	console.log(JSON.stringify(testClassJSON, null, 4).split('\n'));
-	
-	var classFile = new File(
-			[JSON.stringify(testClassJSON, null, 4)],
-			"testbadgeclass.json",
-			{type: "text/plain"});
-	
-	classForm.append("filecontent", classFile);
 	classForm.append("identifier", "testclassidentifier");
 	classForm.append("sharewithgroup", "");
 	classForm.append("excludefromindex", false);
 	classForm.append("description", "testdescription");
 	
-	sendFormDataToFileService(imageForm);
 	sendFormDataToFileService(classForm);
 	
 }
 
+function downloadBadgeClass(){
+	var nameField = document.getElementById("badgename"); // string
+	var descField = document.getElementById("badgedescription"); // string
+	var crMRField = document.getElementById("badgecriteriamr"); // + string
+	var imagField = document.getElementById("badgeimageuri");  // url png
+	var critField = document.getElementById("badgecriteriauri");   // url html
+	var issuField = document.getElementById("issueruri");  // url json
+	
+	var jsonBadge = {
+		"name": nameField.value,
+		"description": descField.value + " ###MACHINE_READABLE###" + crMRField.value,
+		"image": imagField.value,
+		"criteria": critField.value,
+		"issuer": issuField.value
+	}
+	
+	downloadFileFromText(JSON.stringify(jsonBadge, null, 4), "badge_class_"+nameField.value, ".json");
+	
+}
 
 function uploadBadgeImageToFileService(){
 	var imageInput = document.getElementById("badgefileinput");
@@ -635,25 +692,31 @@ function uploadBadgeImageToFileService(){
 	imageForm.append("excludefromindex", false);
 	imageForm.append("description", "testdescription");
 	
-	sendFormDataToFileService(imageForm);
+	sendFormDataToFileService(imageForm, "badgeimageuri");
 }
 
 function uploadCriteriaToFileService(){
 	var textField = document.getElementById("badgecriteria");
 	
-	var criteria = constructFormDataFromText(textField.value, "testriteria", ".html");
+	var criteria = constructFormDataFromText(textField.value, "testcriteria", ".html");
 	
 	criteria.append("identifier", "testcriteriaidentifier");
 	criteria.append("sharewithgroup", "");
 	criteria.append("excludefromindex", false);
 	criteria.append("description", "testdescription");
 	
-	sendFormDataToFileService(criteria);
+	sendFormDataToFileService(criteria, "badgecriteriauri");
+}
+
+function downloadCriteria(){
+	var textField = document.getElementById("badgecriteria");
+	
+	downloadFileFromText(textField.value, "testcriteria", ".html");
 }
 
 function uploadIssuerDataToFileService(){
 	var nameField = document.getElementById("issuername");
-	var urlField = document.getElementById("issuerurl");
+	var urlField = document.getElementById("issuerweb");
 	
 	var jsonData = {
 		"name": nameField.value,
@@ -669,8 +732,23 @@ function uploadIssuerDataToFileService(){
 	issuer.append("excludefromindex", false);
 	issuer.append("description", "testdescription");
 	
-	sendFormDataToFileService(issuer);
+	sendFormDataToFileService(issuer, "issueruri");
+}
+
+function downloadIssuerData(){
+	var nameField = document.getElementById("issuername");
+	var urlField = document.getElementById("issuerWeb");
 	
+	var jsonData = {
+		"name": nameField.value,
+		"url": urlField.value
+	}
+	
+	var ident = "issuer_"+nameField.value.replace(/ /g,"_");
+	
+	var issuer = constructFormDataFromText(JSON.stringify(jsonData, null, 4), ident, ".json");
+	
+	downloadFileFromText(JSON.stringify(jsonData, null, 4), ident, ".json");
 }
 
 function constructFormDataFromText(fileTextContent, fileName, fileEnding ){
@@ -694,7 +772,12 @@ function constructFormDataFromText(fileTextContent, fileName, fileEnding ){
 	return formData;
 }
 
-function sendFormDataToFileService(formData){
+function sendFormDataToFileService(formData, uriField){
+	
+	if(uriField === undefined){
+		uriField = "";
+	}
+	
 	$.ajax({
 		url: "https://las2peer.dbis.rwth-aachen.de:9098/fileservice/files",
 		type: "POST",
@@ -712,6 +795,11 @@ function sendFormDataToFileService(formData){
 			console.log("file submitted");
 			console.log(textStatus);
 			console.log(data);
+			
+			if(uriField != ""){
+				document.getElementById(uriField).value = data;
+			}
+			
 		},
 		error: function(jqxhr, status, error){
 			console.log(jqxhr);
@@ -719,6 +807,34 @@ function sendFormDataToFileService(formData){
 			console.log(error);
 		}
 	});
+}
+
+function downloadFileFromText(fileTextContent, fileName, fileEnding){
+	
+	var MIMEtype = "text/plain";
+	
+	switch(fileEnding){
+		case ".json": MIMEtype = "application/json"; break;
+		case ".html": MIMEtype = "text/html"; break;
+	}
+	
+	var file = new Blob(
+			[fileTextContent],
+			{type: MIMEtype});
+			
+	if(window.navigator.msSaveOrOpenBlob) {
+		window.navigator.msSaveBlob(file)
+	}else{
+		var temp = window.document.createElement("a");
+			temp.setAttribute("href", window.URL.createObjectURL(file));
+			temp.download = fileName+fileEnding;
+		document.body.appendChild(temp);
+		temp.click();
+		document.body.removeChild(temp);
+		window.URL.revokeObjectURL(file);
+	}
+	
+	
 }
 
 
