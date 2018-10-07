@@ -1,4 +1,6 @@
-// on start-up prepare necessary UI elements
+
+// constants
+var FILESERVICE = "https://las2peer.dbis.rwth-aachen.de:9098/fileservice/files";
 
 var UIDiv;
 var twoFields = false;
@@ -25,6 +27,7 @@ var chart2 = null;
 var badgesDiv;
 var badgeRecommendations = [];
 
+// on start-up prepare necessary UI elements
 $(document).ready(function(){
     // check location within HTML page to start adding elements
     UIDiv = document.getElementById("frontendUI");
@@ -633,6 +636,14 @@ function compareKeys(a, b){
     return a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0;
 }
 
+function getMIMETypeFromFileEnding(fileEnding){
+	switch(fileEnding){
+		case ".json": return "application/json";
+		case ".html": return "text/html";
+		default: return "text/plain";
+	}
+}
+
 //TODO:: Finish implementation of upload function
 function uploadBadgeClassToFileservice(){
 	var nameField = document.getElementById("badgename"); // string
@@ -737,7 +748,7 @@ function uploadIssuerDataToFileService(){
 
 function downloadIssuerData(){
 	var nameField = document.getElementById("issuername");
-	var urlField = document.getElementById("issuerWeb");
+	var urlField = document.getElementById("issuerweb");
 	
 	var jsonData = {
 		"name": nameField.value,
@@ -753,17 +764,12 @@ function downloadIssuerData(){
 
 function constructFormDataFromText(fileTextContent, fileName, fileEnding ){
 	
-	var MIMEtype = "text/plain";
-	
-	switch(fileEnding){
-		case ".json": MIMEtype = "application/json"; break;
-		case ".html": MIMEtype = "text/html"; break;
-	}
+	var MIMEType = getMIMETypeFromFileEnding(fileEnding);
 	
 	var file = new File(
 			[fileTextContent],
 			"filename"+fileEnding,
-			{type: MIMEtype});
+			{type: MIMEType});
 	
 	var formData = new FormData();
 	
@@ -779,7 +785,7 @@ function sendFormDataToFileService(formData, uriField){
 	}
 	
 	$.ajax({
-		url: "https://las2peer.dbis.rwth-aachen.de:9098/fileservice/files",
+		url: FILESERVICE,
 		type: "POST",
 		data: formData,
 		mimeTypes: "multipart/form-data",
@@ -795,9 +801,9 @@ function sendFormDataToFileService(formData, uriField){
 			console.log("file submitted");
 			console.log(textStatus);
 			console.log(data);
-			
+			alert("Fileupload Successful at: "+FILESERVICE+"/"+data);
 			if(uriField != ""){
-				document.getElementById(uriField).value = data;
+				document.getElementById(uriField).value = FILESERVICE + "/" + data;
 			}
 			
 		},
@@ -805,22 +811,18 @@ function sendFormDataToFileService(formData, uriField){
 			console.log(jqxhr);
 			console.log(status);
 			console.log(error);
+			alert("Fileupload Failed. See log for details.")
 		}
 	});
 }
 
 function downloadFileFromText(fileTextContent, fileName, fileEnding){
 	
-	var MIMEtype = "text/plain";
-	
-	switch(fileEnding){
-		case ".json": MIMEtype = "application/json"; break;
-		case ".html": MIMEtype = "text/html"; break;
-	}
+	var MIMEType = getMIMETypeFromFileEnding(fileEnding);
 	
 	var file = new Blob(
 			[fileTextContent],
-			{type: MIMEtype});
+			{type: MIMEType});
 			
 	if(window.navigator.msSaveOrOpenBlob) {
 		window.navigator.msSaveBlob(file)
@@ -927,6 +929,45 @@ function setDeclarations(){
     }
 }
 
+function addChartToCanvas(canvas, chart, type, labels, data, labelx, labely){
+	
+	if(chart != null){
+			chart.destroy();
+		}
+		
+        chart = new Chart(canvas,
+            {   
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            data: data
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        xAxes: [{
+                            scaleLabel: {
+                                display: true,
+                                labelString: labelx,
+                                type: 'time'
+                            }
+                        }],
+                        yAxes: [{
+                            scaleLabel: {
+                                display: true,
+                                labelString: labely
+                            }
+                        }]
+                    }
+                }
+            }
+        );
+	
+}
+
 //TODO:: split of chart creation into separate function
 function analyseXAPI(){
     
@@ -964,40 +1005,7 @@ function analyseXAPI(){
         //TODO:: make separate function for charts! Also delete existing charts when generating new ones...
         var canvas = document.getElementById("canvas1");
 		
-		if(chart1 != null){
-			chart1.destroy();
-		}
-		
-        chart1 = new Chart(canvas,
-            {   
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            data: values
-                        }
-                    ]
-                },
-                options: {
-                    scales: {
-                        xAxes: [{
-                            scaleLabel: {
-                                display: true,
-                                labelString: results.keyX,
-                                type: 'time'
-                            }
-                        }],
-                        yAxes: [{
-                            scaleLabel: {
-                                display: true,
-                                labelString: results.keyY
-                            }
-                        }]
-                    }
-                }
-            }
-        );
+		addChartToCanvas(canvas, chart1, 'bar', labels, values, results.keyX, results.keyY);
         
         if(!twoFields){
             results.badges.forEach(function(element) {
@@ -1029,40 +1037,7 @@ function analyseXAPI(){
             
             var canvas = document.getElementById("canvas2");
             
-			if(chart2 != null){
-				chart2.destroy();
-			}
-			
-			chart2 = new Chart(canvas,
-                {   
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                data: values
-                            }
-                        ]
-                    },
-                    options: {
-                        scales: {
-                            xAxes: [{
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: results.keyX,
-                                    type: 'time'
-                                }
-                            }],
-                            yAxes: [{
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: results.keyY
-                                }
-                            }]
-                        }
-                    }
-                }
-            );
+			addChartToCanvas(canvas, chart2, 'bar', labels, values, results.keyX, results.keyY);
 
         }).fail(function(xhr, status, error){
             alert("Error: please check if a backend instance is running at the specified location.");
