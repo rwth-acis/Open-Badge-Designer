@@ -1,6 +1,5 @@
 package i5.obd.backend;
 
-import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -22,12 +21,15 @@ public class Result{
     /** This List holds pairs of values which may be used for graphs in the Frontend. */
     private List<Pair> values;
     
+    private List<Badge> badges;
+    
     /** Empty Constructor. Only prepares empty values for everything. */
     public Result(){
         status = "";
         keyX = "";
         keyY = "";
         values = new ArrayList<Pair>();
+        badges = new ArrayList<Badge>();
     }
     
     /**
@@ -46,6 +48,13 @@ public class Result{
         }
         if(values.size() > 0)
             out = out.substring(0, out.length() - 1);
+        out = out + "]" + ",";
+        out = out + "\"badges\":" + "[";
+        for(Badge badge: badges) {
+        	out = out + badge.toJSONString() + ",";
+        }
+        if(badges.size() > 0)
+        	out = out.substring(0, out.length() - 1);
         out = out + "]";
         out = out + "}";
         return out;
@@ -138,5 +147,10 @@ public class Result{
     public void addPair(String valueX, Integer valueY){
         values.add(new Pair(valueX, valueY));
     }
+
+	public void addBadge(Badge badge) {
+		// TODO Auto-generated method stub
+		this.badges.add(badge);
+	}
 
 }
