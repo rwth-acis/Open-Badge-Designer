@@ -196,12 +196,15 @@ public class BackendService {
                  *   and JSON Objects are handled as Objects which are essentially Maps, though not automatically
                  *   recognized (thus the casting).
                  *   
-                 *   To go deeper into the JSON of a statement (not necessary in this version) it will be needed to 
-                 *   adapt getValuesAtKeys() to proceed recursively and check for each Object whether it's a 
-                 *   JSON Object or a JSONListAdapter or specify dedicated locations to check for (such as the
-                 *   extensions section of the results which can be part of a statement).
+                 *   Caution: In this prototype any key is assumed to be either a timestamp variation, or a score extension.
+                 *   
+                 *   To go deeper into the JSON of a statement automatically (not necessary in this version) 
+                 *   it will be needed to adapt getValuesAtKeys() to proceed recursively and check for each 
+                 *   Object whether it's a JSON Object (Map) or a JSONListAdapter or specify dedicated locations 
+                 *   to check for (such as the extensions section of the results which can be part of a statement).
                 */
                 JSONListAdapter statements = (JSONListAdapter)body.get("statements");
+                
                 if (key.equals("hour") || key.equals("day") || key.equals("month")){
                     values.addAll(getValuesAtKey(statements, "timestamp"));
                 }else{
@@ -308,7 +311,14 @@ public class BackendService {
 	/**
     * This is a helper method to simplify received statements into
     * the actual needed values.
-    * Currently only String values are supported.
+    * Currently only String values are supported, so numbers should be stored as Strings.
+    * 
+    * Caution: This prototype interprets timestamp varieties as being surface-level statement fields.
+    * 		   Any other keys are interpreted as result extensions.
+    * 		   To access any other fields, this needs to be modified:
+    * 				- Using a search algorithm a specific key could be found in each tree-like statement
+    * 				- Alternatively additional input parameters could be used to specify where the
+    * 					application should look.
     *
     * @param statements the JSONListAdapter containing a Collection of xAPI statements
     * @param key the key to look for in each JSON-encoded (now turned into a Map) xAPI statement
@@ -318,16 +328,20 @@ public class BackendService {
         List<String> result = new ArrayList<String>();
     
         for(Object statement : statements.values()){
-        	/*
-        	 * TODO:: Custom warning if maps are not <String, String>
-        	 * 
-        	 * Since This is only intended to be used with a JSON representation of statement fields
-        	 * where each one contains a String. If used incorrectly (such as trying to access a statement
-        	 * field which contains a sub-object or array), it won't work yet.
-        	 */
-            @SuppressWarnings("unchecked") 
-			Map<String, String> stmtmap = (Map<String, String>) statement;
-            result.add((String) stmtmap.get(key));
+        	if(key.equals("timestamp")) {
+        		@SuppressWarnings("unchecked") 
+        		Map<String, Object> stmtmap = (Map<String, Object>) statement;
+                result.add((String) stmtmap.get(key));
+        	}else {
+	        	@SuppressWarnings("unchecked")
+				Map<String, Object> stmtMap = (Map<String, Object>) statement;
+	        	@SuppressWarnings("unchecked")
+				Map<String, Object> stmtResult = (Map<String, Object>) stmtMap.get("result");
+	        	@SuppressWarnings("unchecked")
+				Map<String, Object> stmtResExt = (Map<String, Object>) stmtResult.get("extensions");
+	        	result.add((String) stmtResExt.get(key));
+        	}
+			
         }
         
         return result;

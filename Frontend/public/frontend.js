@@ -101,6 +101,7 @@ function constructAssistedBadgeMode(){
     appendDivWithBackendUI(leftDiv);
     appendDivWithSourceUI(leftDiv);
     appendDivWithDeclarationsUI(leftDiv);
+    appendDivWithBadgeUI(leftDiv);
     appendDivWithAnalyticsUI(rightDiv, "canvas1");
     appendDivForBadgeRecommendations(rightDiv);
     
@@ -409,7 +410,7 @@ function appendDivForBadgeRecommendations(elem){
     elem.appendChild(badgesDiv);
 }
 
-/*
+/* shape of badges array transferred from Backend:
 "badges":[{
     "name":"A new Badge",
     "description":"Earned by fulfilling the criteria!",
@@ -426,23 +427,50 @@ function appendDivForBadgeRecommendations(elem){
     "notes":"This Badge is scaled by 3 * the total sum for all included users. 
             This value may be much too large if data for all agents is used for a single user. 
             Please adjust."
-    }
+    }, ...
 */
 
 function appendDivWithBadgeRecommendation(elem, badgeData){
+
+    badgeDiv = document.createElement("DIV");
+    badgeDiv.style.backgroundColor = 'lightgreen';
+    badgeDiv.className = 'recommendation';    
+    
     var badge = {};
     
-    badge["DIV"] = document.createElement("DIV");
-    badge["DIV"].style.backgroundColor = 'lightgreen';
-    
     badge["name"] = badgeData["name"];
+    badge["criteria"] = badgeData["criteria"];
+    badge["description"] = badgeData["description"];
+    badge["criteriamr"] = badgeData["criteriamachinereadable"];
     //...
+    jQuery.data(badgeDiv, "badge", badge);
     
+    //console.log(jQuery.data(badgeDiv, "badge")["name"]);
+    
+    var removeButton = document.createElement("BUTTON");
+        removeButton.appendChild(document.createTextNode("X"));
+        removeButton.onclick = function(){
+            $(this).closest('.recommendation').remove();
+        };
+        removeButton.style.width = '15px'
+    var applyRecommendationButton = document.createElement("BUTTON");
+        applyRecommendationButton.appendChild(document.createTextNode("Apply"));
+        applyRecommendationButton.onclick = function(){
+            div = $(this).closest('.recommendation')[0];
+            document.getElementById('badgename').value = jQuery.data(div, "badge")["name"];
+            document.getElementById('badgedescription').value = jQuery.data(div, "badge")["description"];
+            document.getElementById('badgecriteria').value = jQuery.data(div, "badge")["criteria"];
+            document.getElementById('badgecriteriamr').value = jQuery.data(div, "badge")["criteriamr"];
+            console.log(jQuery.data(div, "badge"));
+        }
+    var removeButtonP = document.createElement("p");
+        removeButtonP.appendChild(removeButton);
     var nameTextP = document.createElement("p");
-        nameTextP.appendChild(document.createTextNode(badge["name"]));
-    badge["DIV"].appendChild(nameTextP);
+        nameTextP.appendChild(document.createTextNode(badge["criteria"]));
+    appendChildren(badgeDiv, removeButtonP, applyRecommendationButton, nameTextP);
+    //badgeDiv.appendChild(removeButtonP, applyRecommendationButton, nameTextP);
     
-    elem.appendChild(badge["DIV"]);
+    elem.appendChild(badgeDiv);
 }
 
 function appendDivWithBadgeUI(elem){
