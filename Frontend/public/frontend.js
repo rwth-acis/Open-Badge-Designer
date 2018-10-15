@@ -191,9 +191,10 @@ function appendPWithReturnButton(elem){
 function appendDivWithBackendUI(elem){
 
     var backendDiv = document.createElement("DIV");
-        backendDiv.style.backgroundColor = 'lightcoral';
+        //backendDiv.style.backgroundColor = 'lightcoral';
+        backendDiv.style.border = '2px solid black';
     
-    var backendText = document.createTextNode("Step 1 (necessary): connect to a Backend instance");
+    var backendText = document.createTextNode("Please add the URL of the Backend to connect.");
     var backendTextP = document.createElement("p");
         backendTextP.appendChild(backendText);
         backendTextP.append(backendText);
@@ -203,6 +204,7 @@ function appendDivWithBackendUI(elem){
             ["type", "text"],
             ["placeholder", "http://localhost:9003/OpenBadgeDesigner"],
             ["id", "backendfield"]);
+    backendField.style.width = '300px';
     var backendFieldP = document.createElement("p");
         backendFieldP.appendChild(backendField);
     
@@ -225,10 +227,11 @@ function appendDivWithBackendUI(elem){
 function appendDivWithSourceUI(elem){
     
     sourceDiv = document.createElement("DIV");
-    sourceDiv.style.backgroundColor = 'lightsalmon';
+    //sourceDiv.style.backgroundColor = 'lightsalmon';
+    sourceDiv.style.border = '2px solid black';
     
     // create elements for information for the LRS
-    var urlText = document.createTextNode("Add URL of your Learning Record Store: ");
+    var urlText = document.createTextNode("Next, add the URL of your Learning Record Store: ");
     var urlTextP = document.createElement("p");
         urlTextP.appendChild(urlText);
     
@@ -248,7 +251,7 @@ function appendDivWithSourceUI(elem){
     var authorizeFieldP = document.createElement("p");
         authorizeFieldP.appendChild(authorizeField);
     
-    var authorizeText = document.createTextNode("Add HTTP authorization for the LRS");
+    var authorizeText = document.createTextNode("And HTTP authorization info for it.");
     var authorizeTextP = document.createElement("p");
         authorizeTextP.appendChild(authorizeText);
    
@@ -267,7 +270,8 @@ function appendDivWithSourceUI(elem){
 function appendDivWithDeclarationsUI(elem){
     
     declareDiv = document.createElement("DIV");
-    declareDiv.style.backgroundColor = 'lightpink';
+    //declareDiv.style.backgroundColor = 'lightpink';
+    declareDiv.style.border = '2px solid black';
     
     
     var buttonP = document.createElement("p");
@@ -307,13 +311,15 @@ function appendDivWithDeclarationsUI(elem){
     var objectField = document.createElement("INPUT");
     setAttributes(objectField,
             ["type", "text"],
-            ["placeholder", "http://example.com/activities/someAmazingObject"],
+            ["placeholder", "http://example.com/activities/exampleActivity"],
             ["id", "declarationsobjectfield"]);
+    objectField.style.width = '360px';
     var actionField = document.createElement("INPUT");
     setAttributes(actionField,
             ["type", "text"],
-            ["placeholder", "http://example.com/verbs/someEpicVerb"],
+            ["placeholder", "http://example.com/verbs/exampleVerb"],
             ["id", "declarationsactionfield"]);
+    actionField.style.width = '300px';
     //TODO:: add link to wiki (once created) to explain options on input
     var keyText = document.createTextNode("The xAPI statement-key to use.");
     var objectText = document.createTextNode("The xAPI activity (object) to check for.");
@@ -336,7 +342,7 @@ function appendDivWithDeclarationsUI(elem){
     setAttributes(constraintsField,
             ["rows","5"],
             ["cols","60"],
-            ["placeholder", "agent:{\"mbox\":\"mailto : max.mustermann@example.com\"},\nverb : http://example.com/verbs/someEpicVerb,\nactivity : http://example.com/activities/someAmazingObject"],
+            ["placeholder", "agent:{\"mbox\":\"mailto : max.mustermann@example.com\"}"],
             ["id", "declarationsconstraintsfield"]);
     var constraintsFieldP = document.createElement("p");
         constraintsFieldP.appendChild(constraintsField);
@@ -380,7 +386,8 @@ function appendDivWithDeclarationsUI(elem){
 
 function appendDivWithAnalyticsUI(elem, canvasName){
     var analyticsDiv = document.createElement("DIV");
-        analyticsDiv.style.backgroundColor = 'lightgreen';
+        //analyticsDiv.style.backgroundColor = 'lightgreen';
+        analyticsDiv.style.border = '2px solid black';
     
     var text = document.createTextNode("Analytics go here. Enter declarations and hit the Analyse button to get results.");
     var textP = document.createElement("p");
@@ -400,7 +407,8 @@ function appendDivWithAnalyticsUI(elem, canvasName){
 
 function appendDivForBadgeRecommendations(elem){
     var badgesDiv = document.createElement("DIV");
-        badgesDiv.style.backgroundColor = 'lightblue';
+        //badgesDiv.style.backgroundColor = 'lightblue';
+        badgesDiv.style.border = '2px solid black';
         badgesDiv.id = "badgesdiv";
     var text = document.createTextNode("Badge Recommendations go here.");
     var textP = document.createElement("p");
@@ -433,7 +441,8 @@ function appendDivForBadgeRecommendations(elem){
 function appendDivWithBadgeRecommendation(elem, badgeData){
 
     badgeDiv = document.createElement("DIV");
-    badgeDiv.style.backgroundColor = 'lightgreen';
+    //badgeDiv.style.backgroundColor = 'lightgreen';
+    badgeDiv.style.border = '2px solid black';
     badgeDiv.className = 'recommendation';    
     
     var badge = {};
@@ -477,9 +486,12 @@ function appendDivWithBadgeUI(elem){
 	var badgeDiv = document.createElement("DIV");
 	badgeDiv.style.border = '2px solid black';
 	
-	var bText = document.createTextNode("Open Badge Survey: If recommendations are used, applying a recommendation will overwrite some of the fields in this survey!");
+	var bText = document.createTextNode("Open Badge Survey: ");
 	var textP = document.createElement("p");
 		textP.appendChild(bText);
+    var bText2 = document.createTextNode("If recommendations are used, applying a recommendation will overwrite some of the fields in this survey!");
+    var text2P = document.createElement("p");
+        text2P.appendChild(bText2);
 	var generalHR = document.createElement("HR");
 		
 	var badgeFileDiv = document.createElement("DIV");
@@ -589,6 +601,7 @@ function appendDivWithBadgeUI(elem){
 			["id", "badgeimageuri"],
 			["type", "text"],
 			["placeholder", "http://example.com/badges/image_a_new_badge.png"]);
+	badgeImageURIField.style.width = '500px';
 	var badgeImageURIP = document.createElement("p");
 	appendChildren(badgeImageURIP, badgeImageURIField);
 	
@@ -598,6 +611,7 @@ function appendDivWithBadgeUI(elem){
 			["id", "badgecriteriauri"],
 			["type", "text"],
 			["placeholder", "http://example.com/badges/criteria_a_new_badge.html"]);
+	badgeCriteriaURIField.style.width = '500px';
 	var badgeCriteriaURIP = document.createElement("p");
 	appendChildren(badgeCriteriaURIP, badgeCriteriaURIField);
 	
@@ -607,6 +621,7 @@ function appendDivWithBadgeUI(elem){
 			["id", "issueruri"],
 			["type", "text"],
 			["placeholder", "http://example.com/badges/issuer_max_mustermann.json"]);
+	issuerURIField.style.width = '500px';
 	var issuerURIFieldP = document.createElement("P");
 		issuerURIFieldP.appendChild(issuerURIField);
 		
@@ -632,7 +647,7 @@ function appendDivWithBadgeUI(elem){
 	
 	appendChildren(badgeFileDiv, badgeFileTextP, badgeFileInputP);
 	
-	appendChildren(badgeDiv, textP, generalHR, issuerText, issuerNameTextP, issuerNameP, issuerWebTextP, issuerWebP, issuerButtonP, issuerHR, badgeFileDiv, badgeFileHR, badgeCriteriaText, badgeCriteriaP, badgeCriteriaButtonP, badgeCriteriaHR, badgeNameText, badgeNameP, badgeDescriptionText, badgeDescriptionP, badgeCriteriaMRText, badgeCriteriaMRP, badgeImageURIText, badgeImageURIP, badgeCriteriaURIText, badgeCriteriaURIP, issuerURIText, issuerURIFieldP, classButtonP);
+	appendChildren(badgeDiv, textP, text2P, generalHR, issuerText, issuerNameTextP, issuerNameP, issuerWebTextP, issuerWebP, issuerButtonP, issuerHR, badgeFileDiv, badgeFileHR, badgeCriteriaText, badgeCriteriaP, badgeCriteriaButtonP, badgeCriteriaHR, badgeNameText, badgeNameP, badgeDescriptionText, badgeDescriptionP, badgeCriteriaMRText, badgeCriteriaMRP, badgeImageURIText, badgeImageURIP, badgeCriteriaURIText, badgeCriteriaURIP, issuerURIText, issuerURIFieldP, classButtonP);
 	
 	elem.append(badgeDiv);
 }
