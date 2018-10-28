@@ -1,6 +1,28 @@
 
 // constants
-var FILESERVICE = "https://las2peer.dbis.rwth-aachen.de:9098/fileservice/files";
+var FILESERVICE = "https://las2peer.dbis.rwth-aachen.de:9098/fileservice/files"
+// http deployment not intended for longterm use, but currently needed
+// for baking API compatibility of hosted Open Badges
+// var FILESERVICE = "http://las2peer.dbis.rwth-aachen.de:9071/fileservice/files";
+
+// placeholder fields. Some placeholders are used as default values when a field is left empty. These are marked with //# here:
+var PLACEHOLDER_TIMESTAMP = "2001-01-01T00:00:00.000Z"; //#
+var PLACEHOLDER_BACKEND = "http://localhost:9003/OpenBadgeDesigner"; //#
+var PLACEHOLDER_LRS_URL = "http://localhost"; //#
+var PLACEHOLDER_LRS_AUTH = "Basic MTZlODUyNzllYTQ5YzA5YTkzNGE2N2RhOWQzMjQ5M2Y1YTI1OTc5MjpjYWM3YTExYTJhY2E0N2Y2YjMxMDI4YjhkNjA3MTg4MjM2NTk0Y2Yy"; //#
+var PLACEHOLDER_STMT_KEY = "timestamp"; //#
+var PLACEHOLDER_STMT_ACT = "http://example.com/activities/exampleActivity"; //# 
+var PLACEHOLDER_STMT_VRB = "http://example.com/verbs/exampleVerb"; //#
+var PLACEHOLDER_STMT_CON = "agent:{\"mbox\":\"mailto : max.mustermann@example.com\"}";
+var PLACEHOLDER_CRITERIA = "Assisted Badge Mode allows to generate recommendations.";
+var PLACEHOLDER_CRIT_MR = "For manual external implementation you may leave this empty. For use with the Gamification-Framework, use of Recommendations in Assisted Mode is advised.";
+var PLACEHOLDER_ISSR = "max mustermann";
+var PLACEHOLDER_ISSR_URI = "http://example.com/badges";
+var PLACEHOLDER_BDG_NAME = "A new Badge";
+var PLACEHOLDER_BDG_DESC = "Earned by fulfilling the criteria!";
+var PLACEHOLDER_BDG_IMG = "http://example.com/badges/image_a_new_badge.png";
+var PLACEHOLDER_BDG_CRIT = "http://example.com/badges/criteria_a_new_badge.html";
+var PLACEHOLDER_BDG_ISSR = "http://example.com/badges/issuer_max_mustermann.json";
 
 var UIDiv;
 var twoFields = false;
@@ -34,13 +56,12 @@ $(document).ready(function(){
     constructMainMenu();
 });
 
-/*
-    function to generate the Main Menu using DOM Elements
-*/
+
+/**
+ *  function to generate the Main Menu using DOM Elements
+ */
 function constructMainMenu(){
     removeAllChildren(UIDiv);
-
-    
     
     var titleText = document.createTextNode("Open Badge Designer");
     var titleTextP = document.createElement("p");
@@ -73,9 +94,10 @@ function constructMainMenu(){
     appendChildren(UIDiv, titleTextP, subtitleTextP, assistedBadgeButtonP, manualBadgeButtonP, compareButtonP);
 }
 
-/*
-    function to generate the Assisted Badge Design Mode using DOM Elements
-*/
+
+/**
+ *   function to generate the Assisted Badge Design Mode using DOM Elements
+ */
 function constructAssistedBadgeMode(){
     removeAllChildren(UIDiv);
     
@@ -107,20 +129,21 @@ function constructAssistedBadgeMode(){
     
 }
 
-/*
-    function to generate the Manual Badge Design Mode using DOM Elements
-*/
+
+/**
+ *   function to generate the Manual Badge Design Mode using DOM Elements
+ */
 function constructManualBadgeMode(){
     removeAllChildren(UIDiv);
     
     appendPWithReturnButton(UIDiv);
-	
 	appendDivWithBadgeUI(UIDiv);
 }
 
-/*
-    function to generate the Data Comparison Mode using DOM Elements
-*/
+
+/**
+ *   function to generate the Data Comparison Mode using DOM Elements
+ */
 function constructCompareMode(){
     removeAllChildren(UIDiv);
     
@@ -138,7 +161,7 @@ function constructCompareMode(){
     rightDiv.style.right = 0;
     rightDiv.style.position = 'absolute';
     
-    // use different colors to see the Border between Divisions
+    // use different colors to tell apart sections more easily
     leftDiv.style.backgroundColor = 'papayawhip';
     rightDiv.style.backgroundColor = 'wheat';
     
@@ -151,13 +174,13 @@ function constructCompareMode(){
     var sinceField = document.createElement("INPUT");
     setAttributes(sinceField,
         ["type", "text"],
-        ["placeholder", "2001-01-01T00:00:00.000Z"],
+        ["placeholder", PLACEHOLDER_TIMESTAMP],
         ["id", "sincefieldc"]);
     var untilText = document.createTextNode("Until: ");
     var untilField = document.createElement("INPUT");
     setAttributes(untilField,
         ["type", "text"],
-        ["placeholder", "2019-01-01T00:00:00.000Z"],
+        ["placeholder", PLACEHOLDER_TIMESTAMP],
         ["id", "untilfieldc"]);
     var sinceUntilCompareP = document.getElementById("sinceuntilcomparep")
     appendChildren(sinceUntilCompareP, sinceText, sinceField, untilText, untilField);
@@ -166,10 +189,12 @@ function constructCompareMode(){
     appendDivWithAnalyticsUI(rightDiv, "canvas2");
 }
 
-/*
-    appends a paragraph with a 'Return to Menu' button to the selected element.
-*/
 
+/**
+ * appends a paragraph with a 'Return to Menu' button to the selected element.
+ *
+ * @param {Object} elem the DOM Element to append the button to.
+ */
 function appendPWithReturnButton(elem){
 
     var returnButton = document.createElement("BUTTON");
@@ -184,16 +209,22 @@ function appendPWithReturnButton(elem){
     return returnButtonP;
 }
 
-/*
-    appends a division containing the UI for entering Backend information.
-*/
 
+/**
+ * appends a division containing the UI for entering Backend information.
+ *
+ * @param {Object} elem the DOM Element to append the new UI Section to.
+ */
 function appendDivWithBackendUI(elem){
 
     var backendDiv = document.createElement("DIV");
         //backendDiv.style.backgroundColor = 'lightcoral';
         backendDiv.style.border = '2px solid black';
     
+	var backendTitle = document.createTextNode("BACKEND:")
+	var backendTitleP = document.createElement("p");
+		backendTitleP.appendChild(backendTitle);
+		backendTitleP.style.fontWeight = "bold";
     var backendText = document.createTextNode("Please add the URL of the Backend to connect.");
     var backendTextP = document.createElement("p");
         backendTextP.appendChild(backendText);
@@ -202,7 +233,7 @@ function appendDivWithBackendUI(elem){
     var backendField = document.createElement("INPUT");
     setAttributes(backendField,
             ["type", "text"],
-            ["placeholder", "http://localhost:9003/OpenBadgeDesigner"],
+            ["placeholder", PLACEHOLDER_BACKEND],
             ["id", "backendfield"]);
     backendField.style.width = '300px';
     var backendFieldP = document.createElement("p");
@@ -215,17 +246,25 @@ function appendDivWithBackendUI(elem){
         backendButtonP.style.textAlign = 'right';
         backendButtonP.appendChild(backendButton);
     
-    appendChildren(backendDiv, backendTextP, backendFieldP, backendButtonP);
+    appendChildren(backendDiv, backendTitleP, backendTextP, backendFieldP, backendButtonP);
     
     elem.appendChild(backendDiv);
 }
 
-/*
-    appends a division containing the UI used to set the data source location
-    ( source refers to the Learning Record Store [LRS] holding the xAPI data )
-*/
+
+/**
+ *   appends a division containing the UI used to set the data source location
+ *   ( source refers to the Learning Record Store [LRS] holding the xAPI data )
+ *
+ * @param {Object} elem the DOM Element to append the new UI section to.
+ */
 function appendDivWithSourceUI(elem){
     
+	var lrsTitle = document.createTextNode("LEARNING RECORD STORE:")
+	var lrsTitleP = document.createElement("p");
+		lrsTitleP.appendChild(lrsTitle);
+		lrsTitleP.style.fontWeight = "bold";
+	
     sourceDiv = document.createElement("DIV");
     //sourceDiv.style.backgroundColor = 'lightsalmon';
     sourceDiv.style.border = '2px solid black';
@@ -238,7 +277,7 @@ function appendDivWithSourceUI(elem){
     var urlField = document.createElement("INPUT");
     setAttributes(urlField,
             ["type", "text"],
-            ["placeholder", "http://localhost"],
+            ["placeholder", PLACEHOLDER_LRS_URL],
             ["id", "urlfield"]);
     var urlFieldP = document.createElement("p");
         urlFieldP.appendChild(urlField);
@@ -246,7 +285,7 @@ function appendDivWithSourceUI(elem){
     var authorizeField = document.createElement("INPUT");
     setAttributes(authorizeField,
             ["type", "text"],
-            ["placeholder", "Basic MTZlODUyNzllYTQ5YzA5YTkzNGE2N2RhOWQzMjQ5M2Y1YTI1OTc5MjpjYWM3YTExYTJhY2E0N2Y2YjMxMDI4YjhkNjA3MTg4MjM2NTk0Y2Yy"],
+            ["placeholder", PLACEHOLDER_LRS_AUTH],
             ["id", "authfield"]);
     var authorizeFieldP = document.createElement("p");
         authorizeFieldP.appendChild(authorizeField);
@@ -262,13 +301,25 @@ function appendDivWithSourceUI(elem){
         setButtonP.style.textAlign = 'right';
         setButtonP.appendChild(setButton);
     
-    appendChildren(sourceDiv, urlTextP, urlFieldP, authorizeTextP, authorizeFieldP, setButtonP);
+    appendChildren(sourceDiv, lrsTitleP, urlTextP, urlFieldP, authorizeTextP, authorizeFieldP, setButtonP);
     
     elem.appendChild(sourceDiv);
 }
 
+
+/**
+ * appends a division containing input fields to let the user declare
+ * which information in the LRS should be considered.
+ * 
+ * @param {Object} elem the DOM Element to append the new UI section to.
+ */
 function appendDivWithDeclarationsUI(elem){
     
+	var declarationsTitle = document.createTextNode("DECLARATIONS:")
+	var declarationsTitleP = document.createElement("p");
+		declarationsTitleP.appendChild(declarationsTitle);
+		declarationsTitleP.style.fontWeight = "bold";
+	
     declareDiv = document.createElement("DIV");
     //declareDiv.style.backgroundColor = 'lightpink';
     declareDiv.style.border = '2px solid black';
@@ -282,50 +333,28 @@ function appendDivWithDeclarationsUI(elem){
     var textP = document.createElement("p");
         textP.appendChild(text);
     
-    /*
-    var select1 = document.createElement("SELECT");
-        select1.setAttribute("id", "decselect1");
-        var option1_1 = document.createElement("OPTION");
-            option1_1.appendChild(document.createTextNode("Minimise"));
-            option1_1.setAttribute("value", "min");
-        select1.appendChild(option1_1);
-        var option1_2 = document.createElement("OPTION");
-            option1_2.appendChild(document.createTextNode("Maximise"));
-            option1_2.setAttribute("value", "max");
-        select1.appendChild(option1_2);
-    var select2 = document.createElement("select");
-        select2.setAttribute("id", "decselect2");
-        var option2_1 = document.createElement("OPTION");
-            option2_1.appendChild(document.createTextNode("Value"));
-            option2_1.setAttribute("value", "val");
-            select2.appendChild(option2_1);
-        var option2_2 = document.createElement("OPTION");
-            option2_2.appendChild(document.createTextNode("Occurrence"));
-            option2_2.setAttribute("value", "occur");
-            select2.appendChild(option2_2);*/
     var keyField = document.createElement("INPUT");
     setAttributes(keyField,
             ["type", "text"],
-            ["placeholder", "timestamp"],
+            ["placeholder", PLACEHOLDER_STMT_KEY],
             ["id", "declarationskeyfield"]);
     var objectField = document.createElement("INPUT");
     setAttributes(objectField,
             ["type", "text"],
-            ["placeholder", "http://example.com/activities/exampleActivity"],
+            ["placeholder", PLACEHOLDER_STMT_ACT],
             ["id", "declarationsobjectfield"]);
     objectField.style.width = '360px';
     var actionField = document.createElement("INPUT");
     setAttributes(actionField,
             ["type", "text"],
-            ["placeholder", "http://example.com/verbs/exampleVerb"],
+            ["placeholder", PLACEHOLDER_STMT_VRB],
             ["id", "declarationsactionfield"]);
     actionField.style.width = '300px';
-    //TODO:: add link to wiki (once created) to explain options on input
+    
     var keyText = document.createTextNode("The xAPI statement-key to use.");
     var objectText = document.createTextNode("The xAPI activity (object) to check for.");
     var actionText = document.createTextNode("The xAPI verb (action) to check for.");
-    //var selectP = document.createElement("p");
-    //appendChildren(selectP, select1, select2, keyField, keyText);
+    
     var keyP = document.createElement("p");
     var objectP = document.createElement("p");
     var actionP = document.createElement("p");
@@ -342,7 +371,7 @@ function appendDivWithDeclarationsUI(elem){
     setAttributes(constraintsField,
             ["rows","5"],
             ["cols","60"],
-            ["placeholder", "agent:{\"mbox\":\"mailto : max.mustermann@example.com\"}"],
+            ["placeholder", PLACEHOLDER_STMT_CON],
             ["id", "declarationsconstraintsfield"]);
     var constraintsFieldP = document.createElement("p");
         constraintsFieldP.appendChild(constraintsField);
@@ -355,13 +384,13 @@ function appendDivWithDeclarationsUI(elem){
     var sinceField = document.createElement("INPUT");
     setAttributes(sinceField,
         ["type", "text"],
-        ["placeholder", "2001-01-01T00:00:00.000Z"],
+        ["placeholder", PLACEHOLDER_TIMESTAMP],
         ["id", "sincefield"]);
     var untilText = document.createTextNode("Until: ");
     var untilField = document.createElement("INPUT");
     setAttributes(untilField,
         ["type", "text"],
-        ["placeholder", "2019-01-01T00:00:00.000Z"],
+        ["placeholder", PLACEHOLDER_TIMESTAMP],
         ["id", "untilfield"]);
     var sinceUntilP = document.createElement("p");
     appendChildren(sinceUntilP, sinceText, sinceField, untilText, untilField);
@@ -369,9 +398,6 @@ function appendDivWithDeclarationsUI(elem){
     var sinceUntilCompareP = document.createElement("p");
         sinceUntilCompareP.setAttribute("id", "sinceuntilcomparep");
         
-    //since : ,\nuntil : ,\n
-    
-    // add a button to call a function to analyse the LRS on given declarations (TODO:: implement)
     var setButton = document.createElement("BUTTON");
         setButton.appendChild(document.createTextNode("Analyse"));
         setButton.onclick = analyseXAPI;
@@ -379,16 +405,27 @@ function appendDivWithDeclarationsUI(elem){
         setButtonP.appendChild(setButton);
         setButtonP.style.textAlign = 'right';
         
-    appendChildren(declareDiv, textP, keyP, actionP, objectP, constraintsTextP, constraintsFieldP, timeTextP, sinceUntilP, sinceUntilCompareP, setButtonP);
+    appendChildren(declareDiv, declarationsTitleP, textP, keyP, actionP, objectP, constraintsTextP, constraintsFieldP, timeTextP, sinceUntilP, sinceUntilCompareP, setButtonP);
     
     elem.appendChild(declareDiv);
 }
 
+/**
+ * function to append a new UI element containing a canvas used for displaying graphs
+ * in the analytics section.
+ *
+ * @param {Object} elem the DOM element to append the new UI section to
+ * @param {String} canvasName the name of the new canvas
+ */
 function appendDivWithAnalyticsUI(elem, canvasName){
     var analyticsDiv = document.createElement("DIV");
         //analyticsDiv.style.backgroundColor = 'lightgreen';
         analyticsDiv.style.border = '2px solid black';
     
+	var analyticsTitle = document.createTextNode("ANALYTICS:");
+	var analyticsTitleP = document.createElement("P");
+		analyticsTitleP.appendChild(analyticsTitle);
+		analyticsTitleP.style.fontWeight = "bold";
     var text = document.createTextNode("Analytics go here. Enter declarations and hit the Analyse button to get results.");
     var textP = document.createElement("p");
         textP.appendChild(text);
@@ -400,12 +437,23 @@ function appendDivWithAnalyticsUI(elem, canvasName){
     var canvasP = document.createElement("p");
         canvasP.appendChild(canvas);
     
-    appendChildren(analyticsDiv, textP, canvasP);
+    appendChildren(analyticsDiv, analyticsTitleP, textP, canvasP);
     
     elem.appendChild(analyticsDiv);
 }
 
+
+/**
+ * function to append a new UI section to hold Badge Recommendations.
+ *
+ * @param {Object} elem the DOM element to append the new UI section to
+ */
 function appendDivForBadgeRecommendations(elem){
+	var recommendationTitle = document.createTextNode("RECOMMENDATIONS:");
+	var recommendationTitleP = document.createElement("P");
+		recommendationTitleP.appendChild(recommendationTitle);
+		recommendationTitleP.style.fontWeight = "bold";
+		
     var badgesDiv = document.createElement("DIV");
         //badgesDiv.style.backgroundColor = 'lightblue';
         badgesDiv.style.border = '2px solid black';
@@ -413,31 +461,18 @@ function appendDivForBadgeRecommendations(elem){
     var text = document.createTextNode("Badge Recommendations go here.");
     var textP = document.createElement("p");
         textP.appendChild(text);
-        badgesDiv.appendChild(textP);
+	appendChildren(badgesDiv, recommendationTitleP, textP)
     
     elem.appendChild(badgesDiv);
 }
 
-/* shape of badges array transferred from Backend:
-"badges":[{
-    "name":"A new Badge",
-    "description":"Earned by fulfilling the criteria!",
-    "imageuri":"http://example.com/badges/a-new-badge.png",
-    "criteriauri":"http://example.com/badges/a-new-badge-criteria.html",
-    "criteria":"Reach a total SUM of 10413 on the values of xAPI key hour for action http://example.com/verbs/someEpicVerb on Object http://example.com/activities/someAmazingObject",
-    "criteriamachinereadable":"
-        object: http://example.com/activities/someAmazingObject, 
-        action: http://example.com/verbs/someEpicVerb, 
-        key: hour, 
-        condition: SUM[value]>10413, 
-        repetitions: 1",
-    "issuer":"http://example.com/issuers/YOURNAME.json",
-    "notes":"This Badge is scaled by 3 * the total sum for all included users. 
-            This value may be much too large if data for all agents is used for a single user. 
-            Please adjust."
-    }, ...
-*/
 
+/**
+ * function to append a division containing a badge recommendation
+ *
+ * @param {Object} elem the DOM element to append the new UI section
+ * @param {Object} badgeData the JSON object containing information on the badge recommendation.
+ */
 function appendDivWithBadgeRecommendation(elem, badgeData){
 
     badgeDiv = document.createElement("DIV");
@@ -451,10 +486,8 @@ function appendDivWithBadgeRecommendation(elem, badgeData){
     badge["criteria"] = badgeData["criteria"];
     badge["description"] = badgeData["description"];
     badge["criteriamr"] = badgeData["criteriamachinereadable"];
-    //...
+	
     jQuery.data(badgeDiv, "badge", badge);
-    
-    //console.log(jQuery.data(badgeDiv, "badge")["name"]);
     
     var removeButton = document.createElement("BUTTON");
         removeButton.appendChild(document.createTextNode("X"));
@@ -482,6 +515,13 @@ function appendDivWithBadgeRecommendation(elem, badgeData){
     elem.appendChild(badgeDiv);
 }
 
+
+/**
+ * function to append a new UI section containing the Open Badge Survey
+ * to an existing DOM element.
+ *
+ * @param {Object} elem the DOM element to append the new UI section to
+ */
 function appendDivWithBadgeUI(elem){
 	var badgeDiv = document.createElement("DIV");
 	badgeDiv.style.border = '2px solid black';
@@ -489,12 +529,18 @@ function appendDivWithBadgeUI(elem){
 	var bText = document.createTextNode("Open Badge Survey: ");
 	var textP = document.createElement("p");
 		textP.appendChild(bText);
+		textP.style.fontWeight = "bold";
+		textP.style.fontSize = "large";
     var bText2 = document.createTextNode("If recommendations are used, applying a recommendation will overwrite some of the fields in this survey!");
     var text2P = document.createElement("p");
         text2P.appendChild(bText2);
 	var generalHR = document.createElement("HR");
 		
 	var badgeFileDiv = document.createElement("DIV");
+	var badgeFileTitle = document.createTextNode("IMAGE:");
+	var badgeFileTitleP = document.createElement("P");
+		badgeFileTitleP.appendChild(badgeFileTitle);
+		badgeFileTitleP.style.fontWeight = "bold";
 	var badgeFileText = document.createTextNode("You can either upload a .PNG image file directly to the FileService, or enter the URL to an existing one below. The image should be a square PNG with minimum dimensions of 90px and a maximum filesize of 256kb");
 	var badgeFileTextP = document.createElement("p");
 		badgeFileTextP.appendChild(badgeFileText);
@@ -511,13 +557,17 @@ function appendDivWithBadgeUI(elem){
 	appendChildren(badgeFileInputP, badgeFileInput, badgeFileButton);
 	var badgeFileHR = document.createElement("HR");
 	
+	var badgeCriteriaTitle = document.createTextNode("CRITERIA:");
+	var badgeCriteriaTitleP = document.createElement("P");
+		badgeCriteriaTitleP.appendChild(badgeCriteriaTitle);
+		badgeCriteriaTitleP.style.fontWeight = "bold";
 	var badgeCriteriaText = document.createTextNode("You can either upload criteria directly to the FileService, or enter the URL to an existing .html describing the badge criteria below.");
 	var badgeCriteriaField = document.createElement("TEXTAREA");
 	setAttributes(badgeCriteriaField,
 			["rows", "5"],
 			["cols", "60"],
 			["id", "badgecriteria"],
-			["placeholder","Assisted Badge Mode allows to generate recommendations."]);
+			["placeholder", PLACEHOLDER_CRITERIA]);
 	var badgeCriteriaButton = document.createElement("BUTTON");
 		badgeCriteriaButton.appendChild(document.createTextNode("Store Criteria on FileService"));
         badgeCriteriaButton.onclick = uploadCriteriaToFileService;
@@ -537,9 +587,14 @@ function appendDivWithBadgeUI(elem){
 			["rows", "5"],
 			["cols", "60"],
 			["id", "badgecriteriamr"],
-			["placeholder","For manual external implementation you may leave this empty. For use with the Gamification-Framework, use of Recommendations in Assisted Mode is advised."]);
+			["placeholder", PLACEHOLDER_CRIT_MR]);
 	var badgeCriteriaMRP = document.createElement("p");
 	appendChildren(badgeCriteriaMRP, badgeCriteriaMRField);
+	
+	var issuerTitle = document.createTextNode("ISSUER:");
+	var issuerTitleP = document.createElement("P");
+		issuerTitleP.appendChild(issuerTitle);
+		issuerTitleP.style.fontWeight = "bold";
 	
 	var issuerText = document.createTextNode("If you have never created an Open Badge before, you can store issuer metadata on the FileService here or add a link to a self-hosted issuer file below.");
 	var issuerNameText = document.createTextNode("Issuer Name:");
@@ -549,7 +604,7 @@ function appendDivWithBadgeUI(elem){
 	setAttributes(issuerNameField,
 			["id", "issuername"],
 			["type", "text"],
-			["placeholder", "max mustermann"]);
+			["placeholder", PLACEHOLDER_ISSUER]);
 	var issuerNameP = document.createElement("p");
 	appendChildren(issuerNameP, issuerNameField);
 	
@@ -560,7 +615,7 @@ function appendDivWithBadgeUI(elem){
 	setAttributes(issuerWebField,
 			["id", "issuerweb"],
 			["type", "text"],
-			["placeholder", "http://example.com/badges"]);
+			["placeholder", PLACEHOLDER_ISSUER_URL]);
 	var issuerWebP = document.createElement("p");
 	appendChildren(issuerWebP, issuerWebField);
 	
@@ -575,13 +630,16 @@ function appendDivWithBadgeUI(elem){
 	appendChildren(issuerButtonP, issuerButton, issuerButtonDL);
 	var issuerHR = document.createElement("HR");
 	
-	
+	var badgeClassTitle = document.createTextNode("BADGE CLASS:");
+	var badgeClassTitleP = document.createElement("P");
+		badgeClassTitleP.appendChild(badgeClassTitle);
+		badgeClassTitleP.style.fontWeight = "bold";
 	var badgeNameText = document.createTextNode("Badge Name: ");
 	var badgeNameField = document.createElement("INPUT");
 	setAttributes(badgeNameField, 
 			["id", "badgename"],
 			["type", "text"],
-			["placeholder", "A new Badge"]);
+			["placeholder", PLACEHOLDER_BDG_NAME]);
 	var badgeNameP = document.createElement("p");
 	appendChildren(badgeNameP, badgeNameField);
 	
@@ -591,7 +649,7 @@ function appendDivWithBadgeUI(elem){
 			["rows", "5"],
 			["cols", "60"],
 			["id", "badgedescription"],
-			["placeholder", "Earned by fulfilling the criteria!"]);
+			["placeholder", PLACEHOLDER_BDG_DESC]);
 	var badgeDescriptionP = document.createElement("p");
 	appendChildren(badgeDescriptionP, badgeDescriptionField);
 	
@@ -600,7 +658,7 @@ function appendDivWithBadgeUI(elem){
 	setAttributes(badgeImageURIField,
 			["id", "badgeimageuri"],
 			["type", "text"],
-			["placeholder", "http://example.com/badges/image_a_new_badge.png"]);
+			["placeholder", PLACEHOLDER_BDG_IMG]);
 	badgeImageURIField.style.width = '500px';
 	var badgeImageURIP = document.createElement("p");
 	appendChildren(badgeImageURIP, badgeImageURIField);
@@ -610,7 +668,7 @@ function appendDivWithBadgeUI(elem){
 	setAttributes(badgeCriteriaURIField,
 			["id", "badgecriteriauri"],
 			["type", "text"],
-			["placeholder", "http://example.com/badges/criteria_a_new_badge.html"]);
+			["placeholder", PLACEHOLDER_BDG_CRIT]);
 	badgeCriteriaURIField.style.width = '500px';
 	var badgeCriteriaURIP = document.createElement("p");
 	appendChildren(badgeCriteriaURIP, badgeCriteriaURIField);
@@ -620,7 +678,7 @@ function appendDivWithBadgeUI(elem){
 	setAttributes(issuerURIField,
 			["id", "issueruri"],
 			["type", "text"],
-			["placeholder", "http://example.com/badges/issuer_max_mustermann.json"]);
+			["placeholder", PLACEHOLDER_BDG_ISSR]);
 	issuerURIField.style.width = '500px';
 	var issuerURIFieldP = document.createElement("P");
 		issuerURIFieldP.appendChild(issuerURIField);
@@ -635,50 +693,71 @@ function appendDivWithBadgeUI(elem){
 		classButtonDL.onclick = downloadBadgeClass;
 	var classButtonP = document.createElement("P");
 	appendChildren(classButtonP, classButton, classButtonDL);
-		
-	/*
-	var submitButton = document.createElement("BUTTON");
-        submitButton.appendChild(document.createTextNode("SUBMIT"));
-        submitButton.onclick = uploadBadgeDataToFileservice;
-        submitButton.style.width = '223px';
-    var submitButtonP = document.createElement("p");
-        submitButtonP.appendChild(submitButton);
-		submitButtonP.appendChild(document.createTextNode(" to las2peer FileService. (You must be logged into OIDC for this!)"));*/
 	
-	appendChildren(badgeFileDiv, badgeFileTextP, badgeFileInputP);
+	appendChildren(badgeFileDiv, badgeFileTitleP, badgeFileTextP, badgeFileInputP);
 	
-	appendChildren(badgeDiv, textP, text2P, generalHR, issuerText, issuerNameTextP, issuerNameP, issuerWebTextP, issuerWebP, issuerButtonP, issuerHR, badgeFileDiv, badgeFileHR, badgeCriteriaText, badgeCriteriaP, badgeCriteriaButtonP, badgeCriteriaHR, badgeNameText, badgeNameP, badgeDescriptionText, badgeDescriptionP, badgeCriteriaMRText, badgeCriteriaMRP, badgeImageURIText, badgeImageURIP, badgeCriteriaURIText, badgeCriteriaURIP, issuerURIText, issuerURIFieldP, classButtonP);
+	appendChildren(badgeDiv, textP, text2P, generalHR, issuerTitleP, issuerText, issuerNameTextP, issuerNameP, issuerWebTextP, issuerWebP, issuerButtonP, issuerHR, badgeFileDiv, badgeFileHR, badgeCriteriaTitleP, badgeCriteriaText, badgeCriteriaP, badgeCriteriaButtonP, badgeCriteriaHR, badgeClassTitleP, badgeNameText, badgeNameP, badgeDescriptionText, badgeDescriptionP, badgeCriteriaMRText, badgeCriteriaMRP, badgeImageURIText, badgeImageURIP, badgeCriteriaURIText, badgeCriteriaURIP, issuerURIText, issuerURIFieldP, classButtonP);
 	
 	elem.append(badgeDiv);
 }
 
 
-// append several children at once
+/**
+ * function to append multiple children to a single DOM element
+ *
+ * @param {Object} elem the DOM element to append children to
+ * @param {...Object} [arg] a child to append to the specified DOM Element
+ */
 function appendChildren(elem /*children can be passed here */){
     for (var i=1; i<arguments.length; i+=1){
         elem.appendChild(arguments[i]);
     }
 }
 
-// remove all children from an HTML element to make space for new ones.
+
+/**
+ * function to remove all children from a DOM element. 
+ * can be used to clean up the UI when loading into a different view
+ *
+ * @param {Object} elem the DOM element to remove all children from.
+ */
 function removeAllChildren(elem){
     while (elem.firstChild){
         elem.removeChild(elem.firstChild);
     }
 }
 
-// apply several [attribute, value] pairs at once
+
+/**
+ * function to apply multiple [attribute, value] pairs at once
+ *
+ * @param {Object} elem the DOM element to apply new attribute values to
+ * @param {...string[]} arg a list containing an attribute and a value to set it to
+ */
 function setAttributes(elem /*[attribute, value] pairs can be passed here*/){
     for (var i=1; i<arguments.length; i+=1){
         elem.setAttribute(arguments[i][0], arguments[i][1]);
     }
 }
 
-// TODO:: make sure this works with both strings and numbers (I think it does?)
+
+/**
+ * compare function used for sorting
+ * result is 1 i first key is larger, -1 if second key is larger, 0 else
+ * 
+ * @param {string|number} a the first key
+ * @param {string|number} b the second key
+ */
 function compareKeys(a, b){
     return a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0;
 }
 
+
+/**
+ * function to translate file endings into MIME Type for uploading
+ *  
+ * @param {string} fileEnding the file ending to translate (example: ".json")
+ */
 function getMIMETypeFromFileEnding(fileEnding){
 	switch(fileEnding){
 		case ".json": return "application/json";
@@ -687,7 +766,13 @@ function getMIMETypeFromFileEnding(fileEnding){
 	}
 }
 
-//TODO:: Finish implementation of upload function
+/**
+ * function to upload the Badge Class that results from various input
+ * fields in the Open Badge Survey UI to the las2peer FileService.
+ *
+ * this function is specific to the respective UI elements and will not
+ * work without them.
+ */
 function uploadBadgeClassToFileservice(){
 	var nameField = document.getElementById("badgename"); // string
 	var descField = document.getElementById("badgedescription"); // string
@@ -706,7 +791,9 @@ function uploadBadgeClassToFileservice(){
 	
 	var classForm = constructFormDataFromText(JSON.stringify(jsonBadge, null, 4), "badge_class_"+nameField.value, ".json");
 	
-	classForm.append("identifier", "testclassidentifier");
+	var time_modifier = (new Date()).getTime();
+	
+	classForm.append("identifier", "badge_class_"+nameField.value+time_modifier+".json");
 	classForm.append("sharewithgroup", "");
 	classForm.append("excludefromindex", false);
 	classForm.append("description", "testdescription");
@@ -715,6 +802,14 @@ function uploadBadgeClassToFileservice(){
 	
 }
 
+
+/**
+ * function to download the Badge Class that results from various input
+ * fields in the Open Badge Survey UI.
+ *
+ * this function is specific to the respective UI elements and will not
+ * work without them.
+ */
 function downloadBadgeClass(){
 	var nameField = document.getElementById("badgename"); // string
 	var descField = document.getElementById("badgedescription"); // string
@@ -735,13 +830,28 @@ function downloadBadgeClass(){
 	
 }
 
+
+/**
+ * function to upload the Badge Image an input field in the 
+ * Open Badge Survey UI to the las2peer FileService.
+ *
+ * this function is specific to the respective UI elements and will not
+ * work without them.
+ */
 function uploadBadgeImageToFileService(){
 	var imageInput = document.getElementById("badgefileinput");
 	
+	if(!imageInput.files[0].name.endsWith(".png")){
+		alert("Filetype not supported. Please follow the information onscreen.");
+		return;
+	}
+	
 	var imageForm = new FormData();
 	
-	imageForm.append("filecontent", imageInput.files[0]);
-	imageForm.append("identifier", "testimageidentifier");
+	var time_modifier = (new Date()).getTime();
+	
+	imageForm.append("filecontent", imageInput.files[0], "badge_image_"+imageInput.files[0].name.slice(0,-4)+time_modifier+".png");
+	imageForm.append("identifier", "badge_image_"+imageInput.files[0].name.slice(0,-4)+time_modifier+".png");
 	imageForm.append("sharewithgroup", "");
 	imageForm.append("excludefromindex", false);
 	imageForm.append("description", "testdescription");
@@ -749,12 +859,22 @@ function uploadBadgeImageToFileService(){
 	sendFormDataToFileService(imageForm, "badgeimageuri");
 }
 
+
+/**
+ * function to upload the Badge Criteria file that results from various 
+ * input fields in the Open Badge Survey UI to the las2peer FileService.
+ *
+ * this function is specific to the respective UI elements and will not
+ * work without them.
+ */
 function uploadCriteriaToFileService(){
 	var textField = document.getElementById("badgecriteria");
 	
 	var criteria = constructFormDataFromText(textField.value, "testcriteria", ".html");
 	
-	criteria.append("identifier", "testcriteriaidentifier");
+	var time_modifier = (new Date()).getTime();
+	
+	criteria.append("identifier", "testcriteriaidentifier"+time_modifier+".html");
 	criteria.append("sharewithgroup", "");
 	criteria.append("excludefromindex", false);
 	criteria.append("description", "testdescription");
@@ -762,12 +882,28 @@ function uploadCriteriaToFileService(){
 	sendFormDataToFileService(criteria, "badgecriteriauri");
 }
 
+
+/**
+ * function to download the Badge Criteria file that results from various 
+ * input fields in the Open Badge Survey UI.
+ *
+ * this function is specific to the respective UI elements and will not
+ * work without them.
+ */
 function downloadCriteria(){
 	var textField = document.getElementById("badgecriteria");
 	
 	downloadFileFromText(textField.value, "testcriteria", ".html");
 }
 
+
+/**
+ * function to upload the Issuer file that results from various 
+ * input fields in the Open Badge Survey UI to the las2peer FileService.
+ *
+ * this function is specific to the respective UI elements and will not
+ * work without them.
+ */
 function uploadIssuerDataToFileService(){
 	var nameField = document.getElementById("issuername");
 	var urlField = document.getElementById("issuerweb");
@@ -789,6 +925,14 @@ function uploadIssuerDataToFileService(){
 	sendFormDataToFileService(issuer, "issueruri");
 }
 
+
+/**
+ * function to download the Issuer file that results from various 
+ * input fields in the Open Badge Survey UI.
+ *
+ * this function is specific to the respective UI elements and will not
+ * work without them.
+ */
 function downloadIssuerData(){
 	var nameField = document.getElementById("issuername");
 	var urlField = document.getElementById("issuerweb");
@@ -805,6 +949,16 @@ function downloadIssuerData(){
 	downloadFileFromText(JSON.stringify(jsonData, null, 4), ident, ".json");
 }
 
+
+/**
+ * function to construct a File Object containing the given text.
+ * The File is set to its respective MIMEType based on the fileEnding,
+ * and finally added to a new FormData Object to allow uploading it.
+ * 
+ * @param {string} fileTextContent the content to store in a text-based File
+ * @param {string} fileName the intended name for the File
+ * @param {string} fileEnding the ending of the file used as part of the name and to determine the MIMEType
+ */
 function constructFormDataFromText(fileTextContent, fileName, fileEnding ){
 	
 	var MIMEType = getMIMETypeFromFileEnding(fileEnding);
@@ -821,6 +975,13 @@ function constructFormDataFromText(fileTextContent, fileName, fileEnding ){
 	return formData;
 }
 
+/**
+ * function to upload the given FormData Object to the las2peer FileService.
+ * Uses jQuery ajax to upload via xhr.
+ *
+ * @param {FormData} formData the object to upload to the FileService
+ * @param {Object} [uriField] the optional DOM element to store the URL returned by the las2peer FileService on successful upload
+ */
 function sendFormDataToFileService(formData, uriField){
 	
 	if(uriField === undefined){
@@ -839,6 +1000,7 @@ function sendFormDataToFileService(formData, uriField){
 			xhr.setRequestHeader("access_token", window.localStorage["access_token"]);
 			//xhr.setRequestHeader("oidc_provider", window.localStorage["oidc_provider"]);
 			xhr.setRequestHeader("accept", "text/plain");
+			console.log("beforeSend triggered.")
 		},
 		success: function(data, textStatus){
 			console.log("file submitted");
@@ -859,6 +1021,14 @@ function sendFormDataToFileService(formData, uriField){
 	});
 }
 
+
+/**
+ * function to download a new File generated from given text
+ *
+ * @param {string} fileTextContent the text to store in the new file
+ * @param {string} fileName the name of the new File
+ * @param {string} fileEnding the ending (example: ".json") of the file, used as part of the name and to determine the MIMEType of the new File
+ */
 function downloadFileFromText(fileTextContent, fileName, fileEnding){
 	
 	var MIMEType = getMIMETypeFromFileEnding(fileEnding);
@@ -883,6 +1053,10 @@ function downloadFileFromText(fileTextContent, fileName, fileEnding){
 }
 
 
+/**
+ * function to make a connection check to the backend and store connection
+ * details for later reference
+ */
 function setConnection(){
     
     window.backend = document.getElementById("backendfield").value;
@@ -902,6 +1076,12 @@ function setConnection(){
     });
 }
 
+
+/**
+ * function to make a connection check to the xAPI LRS via the backend
+ * and store connection details for later reference. 
+ * (setConnection() must be done first.)
+ */
 function setXAPIConnection(){
 
     window.lrs = document.getElementById("urlfield").value;
@@ -923,12 +1103,14 @@ function setXAPIConnection(){
     });
 }
 
+
+/**
+ * function to set xAPI declarations to the current values of the various
+ * input fields for later reference.
+ *
+ */
+
 function setDeclarations(){
-    //var select1 = document.getElementById("decselect1");
-    //var select2 = document.getElementById("decselect2");
-    
-    //window.option1 = select1.options[select1.selectedIndex].value;
-    //window.option2 = select2.options[select2.selectedIndex].value;
     
     var keyField = document.getElementById("declarationskeyfield");
     var objectField = document.getElementById("declarationsobjectfield");
@@ -972,9 +1154,21 @@ function setDeclarations(){
     }
 }
 
+
+/**
+ * function to add a Chart.js chart to the given canvas
+ * 
+ * @param {Canvas} canvas the canvas to attach the new Chart to
+ * @param {Chart} chart a potentially existing chart which is to be deleted and replaced
+ * @param {string} type the type of the chart to be displayed
+ * @param {string[]} labels the labels of the datasets
+ * @param {number[]} data the values for each label
+ * @param {string} labelx the name of the x axis
+ * @param {string} labely the name of the y axis
+ */
 function addChartToCanvas(canvas, chart, type, labels, data, labelx, labely){
 	
-	if(chart != null){
+	if(!typeof chart === "undefined"){
 			chart.destroy();
 		}
 		
@@ -1011,7 +1205,13 @@ function addChartToCanvas(canvas, chart, type, labels, data, labelx, labely){
 	
 }
 
-//TODO:: split of chart creation into separate function
+
+/**
+ * function to send a request to the backend containing any previously made
+ * declarations.
+ * The backend will communicate with the provided Learning Record Store to 
+ * gather data, visualise it, and generate badge recommendations.
+ */
 function analyseXAPI(){
     
     setDeclarations();
@@ -1045,7 +1245,6 @@ function analyseXAPI(){
         }
         console.log(labels);
         console.log(values);
-        //TODO:: make separate function for charts! Also delete existing charts when generating new ones...
         var canvas = document.getElementById("canvas1");
 		
 		addChartToCanvas(canvas, chart1, 'bar', labels, values, results.keyX, results.keyY);
