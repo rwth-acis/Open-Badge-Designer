@@ -7,6 +7,7 @@ var FILESERVICE = "https://las2peer.dbis.rwth-aachen.de:9098/fileservice/files"
 
 // placeholder fields. Some placeholders are used as default values when a field is left empty. These are marked with //# here:
 var PLACEHOLDER_TIMESTAMP = "2001-01-01T00:00:00.000Z"; //#
+var PLACEHOLDER_TIMESTAMP2 = "2019-01-01T00:00:00.000Z"; //#
 var PLACEHOLDER_BACKEND = "http://localhost:9003/OpenBadgeDesigner"; //#
 var PLACEHOLDER_LRS_URL = "http://localhost"; //#
 var PLACEHOLDER_LRS_AUTH = "Basic MTZlODUyNzllYTQ5YzA5YTkzNGE2N2RhOWQzMjQ5M2Y1YTI1OTc5MjpjYWM3YTExYTJhY2E0N2Y2YjMxMDI4YjhkNjA3MTg4MjM2NTk0Y2Yy"; //#
@@ -180,7 +181,7 @@ function constructCompareMode(){
     var untilField = document.createElement("INPUT");
     setAttributes(untilField,
         ["type", "text"],
-        ["placeholder", PLACEHOLDER_TIMESTAMP],
+        ["placeholder", PLACEHOLDER_TIMESTAMP2],
         ["id", "untilfieldc"]);
     var sinceUntilCompareP = document.getElementById("sinceuntilcomparep")
     appendChildren(sinceUntilCompareP, sinceText, sinceField, untilText, untilField);
@@ -390,7 +391,7 @@ function appendDivWithDeclarationsUI(elem){
     var untilField = document.createElement("INPUT");
     setAttributes(untilField,
         ["type", "text"],
-        ["placeholder", PLACEHOLDER_TIMESTAMP],
+        ["placeholder", PLACEHOLDER_TIMESTAMP2],
         ["id", "untilfield"]);
     var sinceUntilP = document.createElement("p");
     appendChildren(sinceUntilP, sinceText, sinceField, untilText, untilField);
@@ -604,7 +605,7 @@ function appendDivWithBadgeUI(elem){
 	setAttributes(issuerNameField,
 			["id", "issuername"],
 			["type", "text"],
-			["placeholder", PLACEHOLDER_ISSUER]);
+			["placeholder", PLACEHOLDER_ISSR]);
 	var issuerNameP = document.createElement("p");
 	appendChildren(issuerNameP, issuerNameField);
 	
@@ -615,7 +616,7 @@ function appendDivWithBadgeUI(elem){
 	setAttributes(issuerWebField,
 			["id", "issuerweb"],
 			["type", "text"],
-			["placeholder", PLACEHOLDER_ISSUER_URL]);
+			["placeholder", PLACEHOLDER_ISSR_URI]);
 	var issuerWebP = document.createElement("p");
 	appendChildren(issuerWebP, issuerWebField);
 	
@@ -1159,7 +1160,7 @@ function setDeclarations(){
  * function to add a Chart.js chart to the given canvas
  * 
  * @param {Canvas} canvas the canvas to attach the new Chart to
- * @param {Chart} chart a potentially existing chart which is to be deleted and replaced
+ * @param {string} chart name of a potentially existing chart which is to be deleted and replaced
  * @param {string} type the type of the chart to be displayed
  * @param {string[]} labels the labels of the datasets
  * @param {number[]} data the values for each label
@@ -1168,40 +1169,50 @@ function setDeclarations(){
  */
 function addChartToCanvas(canvas, chart, type, labels, data, labelx, labely){
 	
-	if(!typeof chart === "undefined"){
-			chart.destroy();
-		}
+
+	switch(chart){
+		case 'chart1': 
+			if(chart1 != null) chart1.destroy(); break;
+		case 'chart2': 
+			if(chart2 != null) chart2.destroy(); break;
+	}
 		
-        chart = new Chart(canvas,
-            {   
-                type: type,
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            data: data
-                        }
-                    ]
-                },
-                options: {
-                    scales: {
-                        xAxes: [{
-                            scaleLabel: {
-                                display: true,
-                                labelString: labelx,
-                                type: 'time'
-                            }
-                        }],
-                        yAxes: [{
-                            scaleLabel: {
-                                display: true,
-                                labelString: labely
-                            }
-                        }]
-                    }
-                }
-            }
-        );
+	var chartObj = new Chart(canvas,
+		{   
+			type: type,
+			data: {
+				labels: labels,
+				datasets: [
+					{
+						label: 'Number of occurrences per value',
+						data: data
+					}
+				]
+			},
+			options: {
+				scales: {
+					xAxes: [{
+						scaleLabel: {
+							display: true,
+							labelString: labelx,
+							type: 'time'
+						}
+					}],
+					yAxes: [{
+						scaleLabel: {
+							display: true,
+							labelString: labely
+						}
+					}]
+				}
+			}
+		}
+	);
+	
+	switch(chart){
+		case 'chart1': chart1 = chartObj; break;
+		case 'chart2': chart2 = chartObj; break;
+	}
 	
 }
 
@@ -1247,7 +1258,7 @@ function analyseXAPI(){
         console.log(values);
         var canvas = document.getElementById("canvas1");
 		
-		addChartToCanvas(canvas, chart1, 'bar', labels, values, results.keyX, results.keyY);
+		addChartToCanvas(canvas, 'chart1', 'bar', labels, values, results.keyX, results.keyY);
         
         if(!twoFields){
             results.badges.forEach(function(element) {
@@ -1279,7 +1290,7 @@ function analyseXAPI(){
             
             var canvas = document.getElementById("canvas2");
             
-			addChartToCanvas(canvas, chart2, 'bar', labels, values, results.keyX, results.keyY);
+			addChartToCanvas(canvas, 'chart2', 'bar', labels, values, results.keyX, results.keyY);
 
         }).fail(function(xhr, status, error){
             alert("Error: please check if a backend instance is running at the specified location.");
