@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"> </script>
+
+</head>
+
+<body>
+
+<h1>Statement Sender</h1>
+
+
+<script type="text/javascript">
+
+function sendXAPIStatement(statement){
+	console.log("sending Request...");
+
+	// If no other data was submitted, generate a default statement to send.
+	if(statement === undefined)
+		// A statement is a simple JSON object with an actor, verb and object following the xAPI
+		// specification. Additional field such as a timestamp can be added.
+		statement =
+			{
+				"actor" : 
+					{
+						"mbox" : "mailto:" + "example.user@example.com" ,
+						"name" : "Example User"
+					},
+				"verb" : 
+					{
+						"id" : "http://example.com/verbs/exampleVerb",
+						"display" : {"en-US" : "accessed"}
+					},
+				"object" : 
+					{
+						"id" : "http://example.com/activities/exampleActivity",
+						"definition" : {"name" : {"en-US" : "exampleActivityName"}}
+					}
+			};
+	gameID = "anotherGameID"
+
+	var settings = {
+		"async": true,
+		"crossDomain": true,
+		"url": "http://cloud18.dbis.rwth-aachen.de/data/xAPI/statements",
+		"method": "POST",
+		"headers": {
+			"X-Experience-API-Version": "1.0.1",
+			"Content-Type": "application/json",
+			"Authorization": "Basic MWJkMDM4Mjk3YjkwY2NhODc3NTQ4NjVlMDBlMGJjZTJmNTg4ZmNmMTozNmM3MmMzM2EwYzBkYWViMjNkNzA3NGU3MGZkNjUwYmFjMTkzYTlj",
+			"Cache-Control": "no-cache",
+		},
+		"processData": false,
+		"data" : JSON.stringify(statement)
+	};
+
+	$.ajax(settings).done(function (response) {
+	  console.log(response);
+	});
+
+}
+
+function sendTestSet(){
+    
+    var dates = [];
+    var dates_iso = [];
+    var satements = [];
+    var times = [0,0,0,0,1,1,2,3,4,3,3,5,10,15,20,20,30,20,20,19,18,15,13,5];
+    
+    for (i=0;i<times.length;i++){
+        for(j=0;j<times[i];j++){
+            dates.push(new Date(2020, 0+Math.floor(j/28), j % 28, i, 0, 0, 0));
+        }
+    }
+    
+    for(i=0;i<dates.length;i++){
+        dates_iso.push(dates[i].toISOString());
+        
+        newStatement =
+			{
+				"actor" : 
+					{
+						"mbox" : "mailto:" + "max.mustermann@example.com" ,
+						"name" : "Max Mustermann"
+					},
+				"verb" : 
+					{
+						"id" : "http://example.com/verbs/someEpicVerb",
+						"display" : {"en-US" : "accessed"}
+					},
+				"object" : 
+					{
+						"id" : "http://example.com/activities/someAmazingObject",
+						"definition" : {"name" : {"en-US" : "somethingMagical"}}
+					},
+				"timestamp" : dates_iso[i],
+				"stored" : dates_iso[i]
+			};
+		console.log(dates_iso[i]);
+		sendXAPIStatement(newStatement);
+    }
+}
+
+// Run the above script to generate an xAPI statement inside LearningLocker.
+//window.onload = sendXAPIStatement();
+</script>
+
+</body>
+</html>
