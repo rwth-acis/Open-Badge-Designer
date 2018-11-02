@@ -337,13 +337,19 @@ public class BackendService {
         		Map<String, Object> stmtmap = (Map<String, Object>) statement;
                 result.add((String) stmtmap.get(key));
         	}else {
+				// for non-timestamps, check result extensions.
 	        	@SuppressWarnings("unchecked")
 				Map<String, Object> stmtMap = (Map<String, Object>) statement;
 	        	@SuppressWarnings("unchecked")
 				Map<String, Object> stmtResult = (Map<String, Object>) stmtMap.get("result");
 	        	@SuppressWarnings("unchecked")
 				Map<String, Object> stmtResExt = (Map<String, Object>) stmtResult.get("extensions");
-	        	result.add((String) stmtResExt.get(key));
+				// check type, non-Strings should be transformed into Strings
+	        	Object val = stmtResExt.get(key);
+				if(val instanceof String)
+					result.add((String) val);
+				else
+					result.add(String.valueOf(val));
         	}
 			
         }
@@ -381,7 +387,6 @@ public class BackendService {
         }
         
         // switch applies presets for custom values.
-        // TODO:: handle incorrect timestamp format IF this is possible to occur
         System.out.println("key right before switch: " + key);
         if(key.equals("timestamp")){
             System.out.println("Key 'timestamp' replaced with 'hour'");
