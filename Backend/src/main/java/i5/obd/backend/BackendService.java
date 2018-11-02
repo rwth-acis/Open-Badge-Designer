@@ -32,6 +32,10 @@ import java.time.ZonedDateTime;
 
 @Path("")
 public class BackendService {
+	/*
+	    unused test API methods. leaving them here for now in case someone wants to see
+	    the most basic form of these methods.
+	
 	@GET
 	@Path("/{name}")
 	public Response getMsg(@PathParam("name") String name) {
@@ -43,7 +47,7 @@ public class BackendService {
 	public Response getTest() {
 		String output = "TestTestTest";
 		return corsResponseBuilder(200,output);
-	}
+	}*/
 	
 	/////////////////////////////////////////////////////////////////
 	
@@ -236,7 +240,7 @@ public class BackendService {
     
     /**
     * This method was implemented as an early test to send an xAPI request and receive a result.
-    * it is essentially a simpler version of the checkXAPIConnection() method which does not yet
+    * it is essentially a simpler version of the checkXAPIConnection() method which does not
     * receive any parameters. It is not currently used by the Frontend.
     *
     * @return the success state determined by the LRS or an error message.

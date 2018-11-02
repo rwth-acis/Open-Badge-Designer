@@ -687,7 +687,7 @@ BEGIN
 			    -- add point
 				EXECUTE 'UPDATE '|| game_id ||'.member_point SET point_value =  '|| comp_result ||' WHERE member_id = '|| quote_literal(NEW.member_id) ||';';
 			    -- notify about added point
-			    PERFORM PUBLIC.NOTIFY('game:' || game_id || ',user:' || NEW.member_id || ',action:' || 'gainPoints' || ',value:' || comp_result);
+			    PERFORM PUBLIC.NOTIFY('game:' || game_id || ',user:' || NEW.member_id || ',action:' || 'gainPoints' || ',key:' || 'points' || ',value:' || comp_result);
 			END IF;
 
 		END LOOP;

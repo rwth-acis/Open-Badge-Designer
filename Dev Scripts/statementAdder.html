@@ -25,7 +25,7 @@ function sendXAPIStatement(statement){
 				"actor" : 
 					{
 						"mbox" : "mailto:" + "example.user@example.com" ,
-						"name" : "Example User"
+						"name" : "Example User VM"
 					},
 				"verb" : 
 					{
@@ -38,6 +38,9 @@ function sendXAPIStatement(statement){
 						"definition" : {"name" : {"en-US" : "exampleActivityName"}}
 					}
 			};
+			
+	console.log(JSON.stringify(statement));
+	
 	gameID = "anotherGameID"
 
 	var settings = {
@@ -103,7 +106,8 @@ function sendTestSet(){
 }
 
 // Run the above script to generate an xAPI statement inside LearningLocker.
-//window.onload = sendXAPIStatement();
+// uncommenting the following line will cause the html page to immediately add a statement to the 'Gamification Tests' repo
+//ewindow.onload = sendXAPIStatement();
 </script>
 
 </body>
