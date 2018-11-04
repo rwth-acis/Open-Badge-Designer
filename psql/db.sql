@@ -923,7 +923,7 @@ LANGUAGE plpgsql VOLATILE;
 CREATE OR REPLACE FUNCTION PUBLIC.NOTIFY(output text) RETURNS void AS
 $BODY$
 BEGIN
-    PERFORM pg_notify('mymessage', output);
+    PERFORM pg_notify('xapilistener', output);
 END
 $BODY$
 LANGUAGE plpgsql VOLATILE;
