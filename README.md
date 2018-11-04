@@ -44,7 +44,40 @@ mvn clean install
 This results in a WAR file which can be added to any compatible [Tomcat](http://tomcat.apache.org/) instance.
 
 ## Gamification-Framework DB
-[TBA changes to the PSQL database]
+The psql folder in this repository contains an example implementation of the new database changes to the 
+[Gamification-Framework](https://github.com/rwth-acis/Gamification-Framework).
+Setting up a new project with the framework, these files can be used in stead of the ones included in the
+frameworks repository.
+
+To implement the changes on a running instance of the Gamification-Framework, the new features can be run separately
+instead.
+
+### adding the new output function in PSQL
+For this, just execute the following code on your database: 
+(can be used via the console, or using a separate sql file.)
+```
+CREATE OR REPLACE FUNCTION PUBLIC.NOTIFY(output text) RETURNS void AS
+$BODY$
+BEGIN
+    PERFORM pg_notify('xapilistener', output);
+END
+$BODY$
+LANGUAGE plpgsql VOLATILE;
+```
+
+### updating relevant parts of the database to include the new output method
+For this, you will need to ```CREATE OR REPLACE``` any existing functions you wish to send notifications, replacing them
+with a version containing the new additions.
+
+At any point, specifically within functions executed by triggers, to allow tracking updates to the game-state, you can use
+a line like the following to send a notification whenever the code is executed:
+```
+PERFORM PUBLIC.NOTIFY('game:' || game_id || ',user:' || member_id || ',action:' || 'YOUR_ACTION_NAME' || ',key:' || 'YOUR_KEY' || ',value:' || YOUR_VALUE);
+```
+For this, the game_id of a given game and member_id of the interacting member should be known within the specific function,
+as xAPI statements require an agent and an object. 
+The last 2 parts of the string, key and value, are an optional addition which can be used to attach a score or similar value to an
+xAPI statement.
 
 ## PSQL XAPI Tracker
 This Java application is used to track notifications from a PSQL database and build xAPI statements from them.
