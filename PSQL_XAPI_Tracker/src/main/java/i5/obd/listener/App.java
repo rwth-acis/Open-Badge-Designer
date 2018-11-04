@@ -26,17 +26,21 @@ public class App
     private static final String ACTIVITIES_URL = "http://example.com/activities";
     private static final String LRS = "http://cloud18.dbis.rwth-aachen.de/data/xAPI/statements";
     private static final String AUTHENTICATION = "Basic MWJkMDM4Mjk3YjkwY2NhODc3NTQ4NjVlMDBlMGJjZTJmNTg4ZmNmMTozNmM3MmMzM2EwYzBkYWViMjNkNzA3NGU3MGZkNjUwYmFjMTkzYTlj";
+    private static final String DB = "jdbc:postgresql://localhost:5432/gamification_obd";
+    private static final String DBUSER = "gamification";
+    private static final String DBPASS = "gamification";
+    private static final String CHANNEL = "xapilistener";
     
     public static void main(String[] args) throws SQLException{
 
-        String url = "jdbc:postgresql://localhost:5432/gamification_obd";
-        String user = "gamification";
-        String password = "gamification";
+        String url = DB;
+        String user = DBUSER;
+        String password = DBPASS;
         
         conn = DriverManager.getConnection(url, user, password);
         pgconn = (org.postgresql.PGConnection)conn;
         Statement stmt = conn.createStatement();
-        stmt.execute("LISTEN mymessage");
+        stmt.execute("LISTEN "+CHANNEL);
         stmt.close();
         
         while(true){
