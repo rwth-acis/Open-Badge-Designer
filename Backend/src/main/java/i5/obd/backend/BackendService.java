@@ -166,6 +166,14 @@ public class BackendService {
                 attachment=attachment+constraint.replaceFirst(":","=");
             }
         }
+	
+	if (attachment.equals("")){
+	    attachment = attachment + "?";
+	}else{
+	    attachment = attachment + "&";	
+	}
+	attachment = attachment + "verb=" + actionID;
+	attachment = attachment + "&activity=" + objectID;
         
         // add statements path to attachment
         attachment = "/data/xAPI/statements" + attachment;
