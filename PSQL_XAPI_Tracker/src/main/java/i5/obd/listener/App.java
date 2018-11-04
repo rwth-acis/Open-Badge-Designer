@@ -5,9 +5,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import java.io.Reader;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -16,7 +13,14 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class App 
+/**
+ * Class containing the PSQLtoXAPI listener application.
+ * 
+ * @author Daniel Schruff
+ * 
+ * @version 0.1
+ */
+public class App //TODO:: rename this
 {   
     private static Connection conn;
     private static org.postgresql.PGConnection pgconn;
@@ -31,6 +35,12 @@ public class App
     private static final String DBPASS = "gamification";
     private static final String CHANNEL = "xapilistener";
     
+    /**
+     * Main method. Starts the application and contains the listening loop.
+     * 
+     * @param args arguments will be ignored
+     * @throws SQLException
+     */
     public static void main(String[] args) throws SQLException{
 
         String url = DB;
@@ -43,6 +53,8 @@ public class App
         stmt.execute("LISTEN "+CHANNEL);
         stmt.close();
         
+        // since the application is intended to keep running and checking for updates, no condition has been defined
+        // to terminate it.
         while(true){
             try{
                 stmt = conn.createStatement();
@@ -63,9 +75,11 @@ public class App
                         String param = notifications[i].getParameter();
                         System.out.println("Got notification: " + param);
                         
+                        // input is a string of comma-separated key:value pairs.
                         String[] arr = param.split(",");
                         for(String s: arr){
                             String[] kv = s.split(":", 2);
+                            // using switch to allow keys in any order. undefined keys will be ignored.
                             switch(kv[0]){
                                 case "game": gameID = kv[1]; break;
                                 case "user": userID = kv[1]; break;
@@ -94,6 +108,16 @@ public class App
         }
     }
     
+    /**
+     * function to generate xAPI statements from the information provided by a psql notification
+     * 
+     * @param gameID the name identifying the game
+     * @param userID the name identifying the user
+     * @param verb the action that has been taken by the user
+     * @param key an additional key to be stored in a result extension
+     * @param value the value for the additional key
+     * @return the generated xAPI statement as a String
+     */
     public static String generateXAPIStatement(String gameID, String userID, String verb, String key, String value){
         
         String name = userID;
@@ -142,6 +166,12 @@ public class App
         return statement;
     }
     
+    /**
+     * function to upload an xAPI statment in string format to the preset Learning Record Store.
+     * 
+     * @param statement the statement to be uploaded
+     * @throws Exception
+     */
     public static void sendXAPIStatement(String statement) throws Exception{
         String lrs = LRS;
         String auth = AUTHENTICATION;
