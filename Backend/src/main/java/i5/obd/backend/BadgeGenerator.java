@@ -4,21 +4,45 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
-//TODO:: Javadocs
-//TODO:: Abstraction
 
+/**
+ * @author Daniel Schruff
+ * 
+ * version 0.1
+ */
 public class BadgeGenerator{
+	// TODO:: generic BadgeGenerator to allow different methods of recommendation generation
     
     private List<Badge> badges;
     
+    /**
+     * Constructor for a BadgeGenerator object.
+     */
     public BadgeGenerator(){
         this.badges = new ArrayList<Badge>();
     }
     
+    /**
+     * Getter
+     * 
+     * @return list of generated badge recommendations
+     */
     public List<Badge> getBadges(){
         return badges;
     }
     
+    /**
+     * function to generate badges based on the given data
+     * 
+     * @param values list of pairs containing a value and it's frequency in the data set
+     * @param key the xAPI key used
+     * @param actionID the xAPI action (verb) used
+     * @param objectID the xAPI object (activity) used
+     * @param groupable boolean specifying whether the data could be grouped into a preset finite set of groups
+     * @param countable boolean specifying whether the data was recognised as countable (currently, Integer)
+     * @param min_value the minimum value considered. lower will be ignored.
+     * @param max_value the maximum value considered. higher will be ignored.
+     */
     public void generateBadges(List<Pair> values, String key, String actionID, String objectID,boolean groupable, boolean countable, int min_value, int max_value){
         /*
             countable means we are working under the assumption that the value is an integer number
@@ -56,6 +80,15 @@ public class BadgeGenerator{
         }
     }
     
+    
+    /**
+     * function to add the 'sum' type badge
+     * 
+     * @param values given pair data (frequency of values)
+     * @param key used xAPI key
+     * @param actionID used xAPI action (verb)
+     * @param objectID used xAPI object (activity)
+     */
     private void addSumBadge(List<Pair> values, String key, String actionID, String objectID){
         int newSum = 0;
         for (Pair pair: values){
@@ -73,6 +106,15 @@ public class BadgeGenerator{
         this.badges.add(badge);
     }
     
+    /**
+     * function to add the 'uncommon' type badge
+     * 
+     * @param values given pair data (frequency of values)
+     * @param key used xAPI key
+     * @param actionID used xAPI action (verb)
+     * @param objectID used xAPI object (activity)
+     * @param countable boolean to specify whether the data is countable (currently: Integer)
+     */
     private void addUncommonBadge(List<Pair> values, String key, String actionID, String objectID, boolean countable){
     // get values in least common range n times
         //int totalOccurrences = 0;
@@ -113,6 +155,15 @@ public class BadgeGenerator{
         }
     }
     
+    /**
+     * function to add a 'common' type badge
+     * 
+     * @param values given pair data (frequency of values)
+     * @param key used xAPI key
+     * @param actionID used xAPI action (verb)
+     * @param objectID used xAPI object (activity)
+     * @param countable boolean to specify whether the data is countable (currently: Integer)
+     */
     private void addCommonBadge(List<Pair> values, String key, String actionID, String objectID, boolean countable){
     // get values in most common range n times
         //int totalOccurrences = 0;
@@ -153,6 +204,14 @@ public class BadgeGenerator{
         }
     }
     
+    /**
+     * function to add a 'high value' type badge
+     * 
+     * @param values given pair data (frequency of values)
+     * @param key used xAPI key
+     * @param actionID used xAPI action (verb)
+     * @param objectID used xAPI object (activity)
+     */
     private void addHighBadge(List<Pair> values, String key, String actionID, String objectID){
     // get values above X n times. (increase occur of highest values)
         //int totalSum = 0;
@@ -189,6 +248,14 @@ public class BadgeGenerator{
         this.badges.add(badge);
     }
     
+    /**
+     * function to add a 'low value' type badge
+     * 
+     * @param values given pair data (frequency of values)
+     * @param key used xAPI key
+     * @param actionID used xAPI action (verb)
+     * @param objectID used xAPI object (activity)
+     */
     private void addLowBadge(List<Pair> values, String key, String actionID, String objectID){
     // get values below X n times (increase occur of lowest values)
         //int totalSum = 0;

@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
@@ -30,6 +29,14 @@ import jdk.nashorn.internal.runtime.JSONListAdapter;
 
 import java.time.ZonedDateTime;
 
+/**
+ * main class of this Service.
+ * 
+ * 
+ * @author Daniel Schruff
+ * 
+ * @version 0.1
+ */
 @Path("")
 public class BackendService {
 	/*
@@ -357,6 +364,15 @@ public class BackendService {
         return result;
     }
     
+    /**
+     * function to collect the results which will be returned to the front-end
+     * 
+     * @param in input list of values to be used for data extraction.
+     * @param key the xAPI statement key specified by the request.
+     * @param actionID the action (verb) specified by the request.
+     * @param objectID the object (activity) specified by the request.
+     * @return
+     */
     private Result compileResults(List<String> in, String key, String actionID, String objectID){
         Result res = new Result();
         
@@ -490,6 +506,14 @@ public class BackendService {
         return res;
     }
     
+    /**
+     * function to generate the HTTP Response containing the cross origin response headers 
+     * to allow cross origin requests.
+     * 
+     * @param status the respone status
+     * @param entity the results to return to the front-end
+     * @return
+     */
     private Response corsResponseBuilder(int status, String entity) {
     	
     	return Response.status(status).entity(entity)

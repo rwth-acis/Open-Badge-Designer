@@ -4,10 +4,14 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
-* Result Objects are used to hold all values which are supposed to be returned to the Frontend.
-* The values can be extracted using toJSONString() to put it into a format that is easily readable
-* by any Frontend instance.
-*/
+ * @author Daniel Schruff
+ * 
+ * @version 0.1
+ * 
+ * Result Objects are used to hold all values which are supposed to be returned to the Frontend.
+ * The values can be extracted using toJSONString() to put it into a format that is easily readable
+ * by any Frontend instance.
+ */
 public class Result{
     /** Messages about Success/Failure to return to the Frontend. */
     private String status;
@@ -148,8 +152,12 @@ public class Result{
         values.add(new Pair(valueX, valueY));
     }
 
+	/**
+	 * function to add a badge to this result
+	 * 
+	 * @param badge
+	 */
 	public void addBadge(Badge badge) {
-		// TODO Auto-generated method stub
 		this.badges.add(badge);
 	}
 
