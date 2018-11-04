@@ -53,5 +53,46 @@ As part of the Thesis, we use a [Learning Locker](https://learninglocker.net) in
 Specifically, it is designed to work with an altered version of the Gamification-Frameworks PSQL database (see Gamification-Framework DB),
 although any other PSQL database would work, provided it creates notifications in a suitable format.
 
-[TBA describe format]
+To change the database, access information, or listening channel, you can edit 
+the constants defined at the beginning of the App class.
 
+By default, the tracker listens on the channel ```xapilistener```, waiting for
+notifications following the format of a String containing comma-separated 
+key:value pairs.
+Accepted keys are ```game user action key value``` where key and value are optional
+and allow to add an extension to an xAPI statement.
+
+An example notification:
+```
+game:exampleGame,user:exampleUser,action:exampleAction,key:exampleExtension,value:777
+```
+would result in an xAPI statement akin to:
+```
+{
+  "actor":
+  {
+    "mbox": "mailto:exampleUser@example.com",
+    "name": "exampleUser"
+  },
+  "verb":
+  {
+    "id": "http://example.com/exampleAction",
+    "display": {"en-US": "exampleAction"}
+  },
+  "object":
+  {
+    "id": "http://example.com/exampleGame",
+    "display": {"name": {"en-US": "exampleGame"}}
+  },
+  "result":
+  {
+    "completion": true,
+    "success": true,
+    "extensions":
+    {
+      "http://example.com/exampleExtension": 777
+    }
+  }
+}
+```
+uploaded to the pre-set Learning Record Store.
