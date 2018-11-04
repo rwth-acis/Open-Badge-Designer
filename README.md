@@ -25,7 +25,7 @@ Step by Step Tutorial (/example workflow):
         Options for this could be looked up manually within an LRS or provided by the LRS administrator.
         For evaluation, the following data should work:
         - Possible Statement Keys: (recommended: hour)
-            ```hour```,```timestamp```,```day```,```month```
+            ```hour```,```timestamp```,```day```,```month```, ```http://example.com/customData```
         - Possible Verbs: (currently only one is used in the dataset)
             ```http://example.com/verbs/exampleVerb```
         - Possible Activities (objects): (currently only one is used in the dataset)
