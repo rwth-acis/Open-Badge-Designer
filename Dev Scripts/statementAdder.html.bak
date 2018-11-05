@@ -133,7 +133,7 @@ function sendWeirdData(){
 
 	var values = ["B", "A", "C", "A", "A", "C"];
 	
-	for(var i in values){
+	for(var val in values){
 		newStatement =
 			{
 				"actor" : 
@@ -155,7 +155,7 @@ function sendWeirdData(){
 					"completion": true,
 					"success": true,
 					"extensions": {
-						"http://example.com/customData": values[i]
+						"http://example.com/customData": val
 					}
 				}
 			};

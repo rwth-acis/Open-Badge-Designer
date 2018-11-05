@@ -1,9 +1,10 @@
 
 // constants
-var FILESERVICE = "https://las2peer.dbis.rwth-aachen.de:9098/fileservice/files"
+// seed network deployment of fileservice
+// var FILESERVICE = "https://las2peer.dbis.rwth-aachen.de:9098/fileservice/files"
 // http deployment not intended for longterm use, but currently needed
 // for baking API compatibility of hosted Open Badges
-// var FILESERVICE = "http://las2peer.dbis.rwth-aachen.de:9071/fileservice/files";
+var FILESERVICE = "http://las2peer.dbis.rwth-aachen.de:9071/fileservice/files";
 
 // placeholder fields. Some placeholders are used as default values when a field is left empty. These are marked with //# here:
 var PLACEHOLDER_TIMESTAMP = "2001-01-01T00:00:00.000Z"; //#
@@ -1169,6 +1170,8 @@ function setDeclarations(){
  */
 function addChartToCanvas(canvas, chart, type, labels, data, labelx, labely){
 	
+	console.log("chartlabels: "+labels);
+	console.log("chartdata: "+data);
 
 	switch(chart){
 		case 'chart1': 
@@ -1194,14 +1197,16 @@ function addChartToCanvas(canvas, chart, type, labels, data, labelx, labely){
 					xAxes: [{
 						scaleLabel: {
 							display: true,
-							labelString: labelx,
-							type: 'time'
+							labelString: labelx
 						}
 					}],
 					yAxes: [{
 						scaleLabel: {
 							display: true,
 							labelString: labely
+						},
+						ticks: {
+							beginAtZero: true
 						}
 					}]
 				}
@@ -1225,6 +1230,8 @@ function addChartToCanvas(canvas, chart, type, labels, data, labelx, labely){
  */
 function analyseXAPI(){
     
+	var time_start = performance.now();
+	
     setDeclarations();
     
     console.log("key: "+window.key+" constraints: "+window.constraints);
@@ -1241,10 +1248,11 @@ function analyseXAPI(){
     $.ajax({
         url: encodeURI(uriString + ",since:" + window.since1 + ",until:" + window.until1)
     }).then(function(data, status, jqxhr) {
-	    console.log("jqxhr: "+jqxhr);
+	    time_response = performance.now();
+		console.log("Response time: " + (time_response - time_start) + " milliseconds");
+		console.log("jqxhr: "+jqxhr);
 	    console.log("data: "+data);
 	    var results = JSON.parse(data);
-	    alert(results.status);
 	    
 	    var rv = results.values.sort(compareKeys);
 	    
@@ -1265,6 +1273,9 @@ function analyseXAPI(){
                 appendDivWithBadgeRecommendation(document.getElementById("badgesdiv"),element);
             });
         }
+		time_finish = performance.now();
+		console.log("Front-end handling time: " + (time_finish-time_response) + " milliseconds");
+		alert(results.status);
     }).fail(function(xhr, status, error){
         alert("Error: please check if a backend instance is running at the specified location.");
     });
