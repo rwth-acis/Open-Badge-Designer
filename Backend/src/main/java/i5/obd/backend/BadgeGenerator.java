@@ -116,23 +116,22 @@ public class BadgeGenerator{
      * @param countable boolean to specify whether the data is countable (currently: Integer)
      */
     private void addUncommonBadge(List<Pair> values, String key, String actionID, String objectID, boolean countable){
-    // get values in least common range n times
-        //int totalOccurrences = 0;
+        // get values in least common range n times
+        
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
         for (Pair pair: values){
-            //totalOccurrences += pair.getValueY();
             if(pair.getValueY() < min)
                 min = pair.getValueY();
             if(pair.getValueY() > max)
                 max = pair.getValueY();
         }
             
-        int uncommonThreshold = ((max-min)/5)+min;
+        double uncommonThreshold = ((max-min)/5)+min;
         String first_value = "Nope. Nope. Nope.";
         String last_value = "Not intended to show. Ever.";
         boolean groupStarted = false;
-        for (Pair pair: values){
+        for (Pair pair: values){  // (A,3),(B,1),(C,2)
             if (pair.getValueY() < uncommonThreshold){
                 if (!groupStarted)
                     first_value = pair.getValueX();
@@ -142,6 +141,20 @@ public class BadgeGenerator{
                 break;
             }
         }
+        /*
+        
+        for (Pair pair: values){
+            if (pair.getValueY() > commonThreshold){
+                if (!groupStarted)
+                    first_value = pair.getValueX();
+                groupStarted = true;
+                last_value = pair.getValueX();
+            }else if(groupStarted){
+                break;
+            }
+        }
+        
+        */
         if(countable){   
             Badge badge = new Badge();
             badge.setCriteria(String.format("Do Action %s on Object %s with a value between %s and %s on xAPI key %s 3 times.", actionID, objectID, first_value, last_value, key));
@@ -165,19 +178,18 @@ public class BadgeGenerator{
      * @param countable boolean to specify whether the data is countable (currently: Integer)
      */
     private void addCommonBadge(List<Pair> values, String key, String actionID, String objectID, boolean countable){
-    // get values in most common range n times
-        //int totalOccurrences = 0;
+        // get values in most common range n times
+    
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
         for (Pair pair: values){
-            //totalOccurrences += pair.getValueY();
             if(pair.getValueY() < min)
                 min = pair.getValueY();
             if(pair.getValueY() > max)
                 max = pair.getValueY();
         }
             
-        int commonThreshold = (((max-min)/5)*4)+min;
+        double commonThreshold = (((max-min)/5)*4)+min;
         String first_value = "This should never show!";
         String last_value = "This should never show!";
         boolean groupStarted = false;

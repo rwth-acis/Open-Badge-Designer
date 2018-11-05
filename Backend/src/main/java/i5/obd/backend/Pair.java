@@ -46,7 +46,7 @@ public class Pair{
      * @return the JSON String
      */
     public String toJSONString(){
-        return "["+valueX+","+valueY+"]";
+        return "[\""+valueX+"\","+valueY+"]";
     }
     
     /** Getter.
